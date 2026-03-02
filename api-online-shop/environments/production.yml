@@ -1,0 +1,4 @@
+name: production
+variables:
+  - name: BASE_URL
+    value: http://go-online-shop.karm.net
