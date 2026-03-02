@@ -1,0 +1,132 @@
+{
+  "version": "1.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "detailLevel": "All",
+  "tablePositions": [
+    {
+      "name": "Users",
+      "schemaName": "public",
+      "x": 0,
+      "y": 50
+    },
+    {
+      "name": "Items",
+      "schemaName": "public",
+      "x": 261.6435546875,
+      "y": 50
+    },
+    {
+      "name": "Inventories",
+      "schemaName": "public",
+      "x": 523.287109375,
+      "y": 50
+    },
+    {
+      "name": "PurchaseHistories",
+      "schemaName": "public",
+      "x": 784.9306640625,
+      "y": 50
+    },
+    {
+      "name": "UserBalances",
+      "schemaName": "public",
+      "x": 0,
+      "y": 388
+    }
+  ],
+  "tableGroupCollapseStates": [],
+  "stickyNoteLayouts": [],
+  "referencePaths": [
+    {
+      "firstFieldNames": [
+        "AdminId"
+      ],
+      "firstTableName": "Items",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "UserId"
+      ],
+      "secondTableName": "Users",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "UserId"
+      ],
+      "firstTableName": "Inventories",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "UserId"
+      ],
+      "secondTableName": "Users",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "ItemId"
+      ],
+      "firstTableName": "Inventories",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "ItemId"
+      ],
+      "secondTableName": "Items",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "BuyerId"
+      ],
+      "firstTableName": "PurchaseHistories",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "UserId"
+      ],
+      "secondTableName": "Users",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "ItemId"
+      ],
+      "firstTableName": "PurchaseHistories",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "ItemId"
+      ],
+      "secondTableName": "Items",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "UserId"
+      ],
+      "firstTableName": "UserBalances",
+      "firstSchemaName": "public",
+      "firstRelation": "*",
+      "secondFieldNames": [
+        "UserId"
+      ],
+      "secondTableName": "Users",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    }
+  ]
+}

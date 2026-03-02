@@ -1,0 +1,63 @@
+Table Users {
+  UserId int [primary key]
+  Username varchar
+  FullName varchar
+  Email varchar
+  Role varchar [note: "RL-001, RL-002"]
+  ActiveStatus varchar [note: "AVAILABLE / UNAVAILABLE"]
+  CreatedAt timestamp
+  UpdatedAt timestamp
+}
+
+Table Items {
+  ItemId int [primary key]
+  AdminId int [note: "Users id"]
+  Name varchar
+  Description varchar
+  Picture varchar
+  Price int
+  ActiveStatus varchar [note: "AVAILABLE / UNAVAILABLE"]
+  CreatedAt timestamp
+  UpdatedAt timestamp
+}
+
+Table Inventories {
+  InventoryId int 
+  UserId int [note: "Users id"]
+  ItemId int 
+  ActiveStatus varchar [note: "AVAILABLE / UNAVAILABLE"]
+  CreatedAt timestamp
+}
+
+Table PurchaseHistories {
+  PurchaseId int [primary key]
+  BuyerId int
+  ItemId int
+  ItemName int
+  ItemDescription int
+  ItemPrice int
+  Quantity int
+  Type varchar [note: "BUY / SELL"]
+  ActiveStatus varchar [note: "AVAILABLE / UNAVAILABLE"]
+  CreatedAt timestamp
+}
+
+Table UserBalances {
+  BalanceId int [primary key]
+  UserId int
+  Amount int
+  Stauts varchar [note: "BUY / TOPUP"]
+  CreatedAt timestamp
+}
+
+Ref item_user: Items.AdminId > Users.UserId
+
+Ref inventory_user:  Inventories.UserId > Users.UserId
+
+Ref inventory_item: Inventories.ItemId > Items.ItemId
+
+Ref purchase_user: PurchaseHistories.BuyerId > Users.UserId
+
+Ref purchase_item: PurchaseHistories.ItemId > Items.ItemId
+
+Ref balance_user: UserBalances.UserId > Users.UserId

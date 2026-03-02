@@ -1,0 +1,15 @@
+package balance
+
+import "time"
+
+type UserBalanceEntity struct {
+	BalanceId int       `gorm:"column:BalanceId;primaryKey;autoIncrement"`
+	UserId    int       `gorm:"column:UserId"`
+	Amount    int       `gorm:"column:Amount"`
+	Status    string    `gorm:"column:Stauts;size:10;comment:BUY/TOPUP"`
+	CreatedAt time.Time `gorm:"column:CreatedAt;autoCreateTime"`
+}
+
+func (UserBalanceEntity) TableName() string {
+	return "GOST_UserBalances"
+}

@@ -1,0 +1,52 @@
+package config
+
+import (
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
+)
+
+type Env struct {
+	GO_ENV      string
+	APP_PORT    string
+	APP_NAME    string
+	APP_VERSION string
+
+	DB_HOST     string
+	DB_PORT     string
+	DB_USERNAME string
+	DB_PASSWORD string
+	DB_NAME     string
+}
+
+func NewEnv() *Env {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file", err)
+	}
+
+	return &Env{
+		GO_ENV:      getEnv("GO_ENV", "development", false),
+		APP_PORT:    getEnv("APP_PORT", "8000", false),
+		APP_NAME:    getEnv("APP_NAME", "app-online-shop", false),
+		APP_VERSION: getEnv("APP_VERSION", "1.0.0", false),
+
+		DB_HOST:     getEnv("DB_HOST", "localhost", true),
+		DB_PORT:     getEnv("DB_PORT", "1433", false),
+		DB_USERNAME: getEnv("DB_USERNAME", "", true),
+		DB_PASSWORD: getEnv("DB_PASSWORD", "", true),
+		DB_NAME:     getEnv("DB_NAME", "db-online-shop", false),
+	}
+}
+
+func getEnv(key string, defaultValue string, required bool) string {
+	if value, exist := os.LookupEnv(key); exist && value != "" {
+		return value
+	}
+	if required {
+		log.Fatal("Error: Missing required environment variable", "key", key)
+	}
+
+	return defaultValue
+}

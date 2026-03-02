@@ -1,0 +1,18 @@
+package user
+
+import "time"
+
+type UserEntity struct {
+	UserId       int       `gorm:"column:UserId;primaryKey;autoIncrement"`
+	Username     string    `gorm:"column:Username;size:255"`
+	FullName     string    `gorm:"column:FullName;size:255"`
+	Email        string    `gorm:"column:Email;size:255"`
+	Role         string    `gorm:"column:Role;size:10;comment:ADMIN/USER"`
+	ActiveStatus string    `gorm:"column:ActiveStatus;size:20;default:AVAILABLE"`
+	CreatedAt    time.Time `gorm:"column:CreatedAt;autoCreateTime"`
+	UpdatedAt    time.Time `gorm:"column:UpdatedAt;autoUpdateTime"`
+}
+
+func (UserEntity) TableName() string {
+	return "GOST_Users"
+}
