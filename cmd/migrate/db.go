@@ -6,12 +6,12 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/karan-khu/go-online-shop/app/balance"
-	"github.com/karan-khu/go-online-shop/app/inventory"
-	"github.com/karan-khu/go-online-shop/app/item"
-	"github.com/karan-khu/go-online-shop/app/purchase"
-	"github.com/karan-khu/go-online-shop/app/user"
 	"github.com/karan-khu/go-online-shop/config"
+	"github.com/karan-khu/go-online-shop/internal/app/balance"
+	"github.com/karan-khu/go-online-shop/internal/app/inventory"
+	"github.com/karan-khu/go-online-shop/internal/app/item"
+	"github.com/karan-khu/go-online-shop/internal/app/purchase"
+	"github.com/karan-khu/go-online-shop/internal/app/user"
 	"github.com/karan-khu/go-online-shop/pkg/database"
 )
 
