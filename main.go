@@ -14,6 +14,7 @@ import (
 	"github.com/labstack/echo/v5/middleware"
 
 	"github.com/karan-khu/go-online-shop/config"
+	"github.com/karan-khu/go-online-shop/internal/app/item"
 	md "github.com/karan-khu/go-online-shop/internal/middleware"
 	"github.com/karan-khu/go-online-shop/pkg/upload"
 	"github.com/karan-khu/go-online-shop/pkg/validator"
@@ -47,6 +48,8 @@ func main() {
 	app.GET("/api/v1/health", func(c *echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"message": "Server is running!"})
 	})
+
+	item.RegisterRoutes(app, conf)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

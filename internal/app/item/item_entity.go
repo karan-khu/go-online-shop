@@ -1,6 +1,9 @@
 package item
 
-import "time"
+import (
+	"strings"
+	"time"
+)
 
 type ItemEntity struct {
 	ItemId       int       `gorm:"column:ItemId;primaryKey;autoIncrement"`
@@ -16,4 +19,20 @@ type ItemEntity struct {
 
 func (ItemEntity) TableName() string {
 	return "GOST_Items"
+}
+
+func (e *ItemEntity) ToModel(host string) *ItemModel {
+	picture := e.Picture
+	if host != "" && picture != "" {
+		baseURL := strings.TrimSuffix(host, "/")
+		picture = baseURL + "/" + strings.TrimPrefix(picture, "/")
+	}
+	return &ItemModel{
+		ItemId:      e.ItemId,
+		AdminId:     e.AdminId,
+		Name:        e.Name,
+		Description: e.Description,
+		Picture:     picture,
+		Price:       e.Price,
+	}
 }

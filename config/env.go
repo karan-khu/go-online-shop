@@ -10,6 +10,7 @@ import (
 type Env struct {
 	GO_ENV      string
 	APP_PORT    string
+	APP_HOST    string
 	APP_NAME    string
 	APP_VERSION string
 	APP_CORS    string
@@ -32,6 +33,7 @@ func NewEnv() *Env {
 	return &Env{
 		GO_ENV:      getEnv("GO_ENV", "development", false),
 		APP_PORT:    getEnv("APP_PORT", "8000", false),
+		APP_HOST:    getEnv("APP_HOST", "", true),
 		APP_NAME:    getEnv("APP_NAME", "app-online-shop", false),
 		APP_VERSION: getEnv("APP_VERSION", "1.0.0", false),
 		APP_CORS:    getEnv("APP_CORS", "", false),
