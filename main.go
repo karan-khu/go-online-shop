@@ -15,6 +15,7 @@ import (
 
 	"github.com/karan-khu/go-online-shop/config"
 	md "github.com/karan-khu/go-online-shop/internal/middleware"
+	"github.com/karan-khu/go-online-shop/pkg/upload"
 	"github.com/karan-khu/go-online-shop/pkg/validator"
 )
 
@@ -35,6 +36,14 @@ func main() {
 	app.Use(md.RequestLogger(conf.Env))
 	app.Use(md.CorsMiddleware(conf.Env))
 
+	app.Static("/uploads", "./uploads")
+	app.POST("/api/v1/upload/image", func(c *echo.Context) error {
+		path, err := upload.SaveImage(c, "./uploads")
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		}
+		return c.JSON(http.StatusOK, map[string]string{"url": path})
+	})
 	app.GET("/api/v1/health", func(c *echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"message": "Server is running!"})
 	})
