@@ -7,9 +7,9 @@ type ItemHttpHandler interface {
 }
 
 type ItemUsecase interface {
-	ItemList(filter *RequestItemFilter) ([]*ItemModel, error)
+	ItemList(filter *RequestItemFilter) (*ResponseItemList, error)
 }
 
 type ItemRepository interface {
-	Listing(filter *RequestItemFilter) ([]*ItemEntity, error)
+	Listing(filter *RequestItemFilter) ([]*ItemEntity, int, error)
 }

@@ -11,4 +11,16 @@ type ItemModel struct {
 
 type RequestItemFilter struct {
 	SearchText string `query:"search_text"`
+	Page       int    `query:"page"`
+	Limit      int    `query:"limit"`
+}
+
+type ResponseItemList struct {
+	Items      []*ItemModel `json:"items"`
+	Pagination *Pagination  `json:"pagination"`
+}
+
+type Pagination struct {
+	Total      int `json:"total"`
+	TotalPages int `json:"total_pages"`
 }

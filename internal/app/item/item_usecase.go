@@ -2,6 +2,7 @@ package item
 
 import (
 	"log/slog"
+	"math"
 
 	"github.com/karan-khu/go-online-shop/config"
 )
@@ -20,8 +21,8 @@ func NewItemUsecase(logger *slog.Logger, itemRepo ItemRepository, conf *config.C
 	}
 }
 
-func (u *itemUsecaseImpl) ItemList(req *RequestItemFilter) ([]*ItemModel, error) {
-	list, err := u.itemRepo.Listing(req)
+func (u *itemUsecaseImpl) ItemList(req *RequestItemFilter) (*ResponseItemList, error) {
+	list, total, err := u.itemRepo.Listing(req)
 	if err != nil {
 		u.logger.Error("failed to get item list", "error", err)
 		return nil, err
@@ -32,5 +33,11 @@ func (u *itemUsecaseImpl) ItemList(req *RequestItemFilter) ([]*ItemModel, error)
 		itemModels[i] = item.ToModel(u.host)
 	}
 
-	return itemModels, nil
+	return &ResponseItemList{
+		Items: itemModels,
+		Pagination: &Pagination{
+			Total:      total,
+			TotalPages: int(math.Ceil(float64(total) / float64(req.Limit))),
+		},
+	}, nil
 }

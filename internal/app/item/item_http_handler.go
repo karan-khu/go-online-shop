@@ -17,13 +17,18 @@ func NewItemHttpHandler(itemUsecase ItemUsecase) ItemHttpHandler {
 }
 
 func (h *itemHttpHandlerImpl) GetAll(c *echo.Context) error {
-	req := new(RequestItemFilter)
+	req := &RequestItemFilter{
+		Page:  1,
+		Limit: 10,
+	}
 	if err := c.Bind(req); err != nil {
+		c.Logger().Error("failed to bind request", "error", err)
 		return res.BadRequest(c, "Invalid request", err)
 	}
 
 	list, err := h.itemUsecase.ItemList(req)
 	if err != nil {
+		c.Logger().Error("failed to get item list", "error", err)
 		return res.InternalError(c, err)
 	}
 
