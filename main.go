@@ -36,13 +36,6 @@ func main() {
 	app.Use(md.CorsMiddleware(conf.Env))
 
 	app.GET("/api/v1/health", func(c *echo.Context) error {
-		type HealthRequest struct {
-			AccessToken string `json:"access_token" validate:"required"`
-		}
-		req := new(HealthRequest)
-		if err := validator.ValidateSchema(c, req); err != nil {
-			return err
-		}
 		return c.JSON(http.StatusOK, map[string]string{"message": "Server is running!"})
 	})
 
