@@ -27,7 +27,7 @@ var methodColors = map[string]string{
 	"DELETE": colorRed,
 }
 
-func SetLogger(env *config.Env) echo.MiddlewareFunc {
+func RequestLogger(env *config.Env) echo.MiddlewareFunc {
 	return echoMiddleware.RequestLoggerWithConfig(echoMiddleware.RequestLoggerConfig{
 		LogMethod:   true,
 		LogURI:      true,

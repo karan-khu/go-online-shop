@@ -24,7 +24,7 @@ func NewSqlServerDatabase(host, user, pass, db string) sqlServerDatabase {
 
 		conn, err := gorm.Open(sqlserver.Open(connStr))
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		log.Printf("Connected to SQL Server database: %s", db)

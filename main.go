@@ -14,7 +14,8 @@ import (
 	"github.com/labstack/echo/v5/middleware"
 
 	"github.com/karan-khu/go-online-shop/config"
-	md "github.com/karan-khu/go-online-shop/pkg/middleware"
+	"github.com/karan-khu/go-online-shop/pkg/cors"
+	"github.com/karan-khu/go-online-shop/pkg/logger"
 	"github.com/karan-khu/go-online-shop/pkg/validator"
 )
 
@@ -32,10 +33,17 @@ func main() {
 	app.Validator = validator.NewValidator()
 
 	app.Use(middleware.Recover())
-	app.Use(md.SetLogger(conf.Env))
-	app.Use(md.CorsMiddleware(conf.Env))
+	app.Use(logger.RequestLogger(conf.Env))
+	app.Use(cors.CorsMiddleware(conf.Env))
 
 	app.GET("/api/v1/health", func(c *echo.Context) error {
+		type HealthResponse struct {
+			Message string `json:"message" validate:"required"`
+		}
+		req := new(HealthResponse)
+		if err := validator.ValidateSchema(c, req); err != nil {
+			return err
+		}
 		return c.JSON(http.StatusOK, map[string]string{"message": "Server is running!"})
 	})
 
