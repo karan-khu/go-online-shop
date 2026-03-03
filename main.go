@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,15 +15,24 @@ import (
 
 	"github.com/karan-khu/go-online-shop/config"
 	md "github.com/karan-khu/go-online-shop/pkg/middleware"
+	"github.com/karan-khu/go-online-shop/pkg/validator"
 )
 
 func main() {
 	conf := config.NewConfig()
 
 	app := echo.New()
+	level := slog.LevelDebug
+	if conf.Env.GO_ENV == "production" {
+		level = slog.LevelError
+	}
+	app.Logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: level,
+	}))
+	app.Validator = validator.NewValidator()
 
 	app.Use(middleware.Recover())
-	app.Use(md.SetLogger(app, conf.Env))
+	app.Use(md.SetLogger(conf.Env))
 	app.Use(md.CorsMiddleware(conf.Env))
 
 	app.GET("/api/v1/health", func(c *echo.Context) error {

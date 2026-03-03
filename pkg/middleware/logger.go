@@ -2,8 +2,6 @@ package middleware
 
 import (
 	"fmt"
-	"log/slog"
-	"os"
 	"time"
 
 	"github.com/labstack/echo/v5"
@@ -29,16 +27,7 @@ var methodColors = map[string]string{
 	"DELETE": colorRed,
 }
 
-func SetLogger(app *echo.Echo, env *config.Env) echo.MiddlewareFunc {
-	level := slog.LevelDebug
-	if env.GO_ENV == "production" {
-		level = slog.LevelError
-	}
-
-	app.Logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-		Level: level,
-	}))
-
+func SetLogger(env *config.Env) echo.MiddlewareFunc {
 	return echoMiddleware.RequestLoggerWithConfig(echoMiddleware.RequestLoggerConfig{
 		LogMethod:   true,
 		LogURI:      true,
