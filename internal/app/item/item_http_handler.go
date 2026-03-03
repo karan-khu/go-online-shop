@@ -2,9 +2,10 @@ package item
 
 import (
 	"log/slog"
-	"net/http"
 
 	"github.com/labstack/echo/v5"
+
+	"github.com/karan-khu/go-online-shop/pkg/res"
 )
 
 type itemHttpHandlerImpl struct {
@@ -22,12 +23,8 @@ func NewItemHttpHandler(logger *slog.Logger, itemUsecase ItemUsecase) ItemHttpHa
 func (h *itemHttpHandlerImpl) GetAll(c *echo.Context) error {
 	list, err := h.itemUsecase.ItemList()
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		return res.InternalError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"status":  true,
-		"message": "Item list fetched successfully",
-		"result":  list,
-	})
+	return res.Success(c, "Item list fetched successfully", list)
 }

@@ -1,0 +1,45 @@
+package res
+
+import (
+	"net/http"
+
+	"github.com/labstack/echo/v5"
+)
+
+type Response struct {
+	Status  bool        `json:"status"`
+	Message string      `json:"message"`
+	Result  interface{} `json:"result"`
+}
+
+func Success(pctx *echo.Context, message string, result interface{}) error {
+	return pctx.JSON(http.StatusOK, &Response{
+		Status:  true,
+		Message: message,
+		Result:  result,
+	})
+}
+
+func BadRequest(pctx *echo.Context, message string, err error) error {
+	return pctx.JSON(http.StatusBadRequest, &Response{
+		Status:  false,
+		Message: message,
+		Result:  err.Error(),
+	})
+}
+
+func NotFound(pctx *echo.Context, message string, err error) error {
+	return pctx.JSON(http.StatusNotFound, &Response{
+		Status:  false,
+		Message: message,
+		Result:  err.Error(),
+	})
+}
+
+func InternalError(pctx *echo.Context, err error) error {
+	return pctx.JSON(http.StatusInternalServerError, &Response{
+		Status:  false,
+		Message: "Internal server error",
+		Result:  err.Error(),
+	})
+}
