@@ -9,10 +9,6 @@ import (
 	"gorm.io/gorm"
 )
 
-type Database interface {
-	Connect() *gorm.DB
-}
-
 type sqlServerDatabase struct {
 	*gorm.DB
 }
