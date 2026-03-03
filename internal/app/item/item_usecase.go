@@ -1,6 +1,7 @@
 package item
 
 import (
+	"errors"
 	"log/slog"
 	"math"
 
@@ -63,5 +64,15 @@ func (u *itemUsecaseImpl) EditItem(req *RequestItemEdit) (*ItemModel, error) {
 }
 
 func (u *itemUsecaseImpl) DeleteItem(itemId int) error {
+	if !u.itemRepo.FindExists(itemId) {
+		return errors.New("item does not exist")
+	}
+
+	err := u.itemRepo.Archive(itemId)
+	if err != nil {
+		u.logger.Error("failed to delete item", "error", err)
+		return err
+	}
+
 	return nil
 }

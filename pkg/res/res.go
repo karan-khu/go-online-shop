@@ -20,19 +20,19 @@ func Success(pctx *echo.Context, message string, result interface{}) error {
 	})
 }
 
-func BadRequest(pctx *echo.Context, message string, err error) error {
+func BadRequest(pctx *echo.Context, err error) error {
 	return pctx.JSON(http.StatusBadRequest, &Response{
 		Status:  false,
-		Message: message,
-		Result:  err.Error(),
+		Message: err.Error(),
+		Result:  nil,
 	})
 }
 
-func NotFound(pctx *echo.Context, message string, err error) error {
+func NotFound(pctx *echo.Context, err error) error {
 	return pctx.JSON(http.StatusNotFound, &Response{
 		Status:  false,
-		Message: message,
-		Result:  err.Error(),
+		Message: err.Error(),
+		Result:  nil,
 	})
 }
 

@@ -3,6 +3,7 @@ package item
 import (
 	"net/url"
 	"strings"
+	"time"
 )
 
 type ItemModel struct {
@@ -64,4 +65,12 @@ func (r *RequestItemEdit) ToEntity() *ItemEntity {
 		Price:       r.Price,
 		Picture:     strings.TrimPrefix(r.Picture, "/"),
 	}
+}
+
+type ResponseItemDetail struct {
+	AdminId      int       `json:"admin_id"`
+	ActiveStatus string    `json:"active_status"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+	ItemModel
 }

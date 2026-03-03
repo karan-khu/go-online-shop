@@ -42,6 +42,15 @@ func (r *itemRepositoryImpl) Listing(req *RequestItemFilter) ([]*ItemEntity, int
 	return list, int(totalCount), nil
 }
 
+func (r *itemRepositoryImpl) FindExists(itemId int) bool {
+	var count int64
+	if err := r.db.Connect().Model(&ItemEntity{}).Where("ItemId = ?", itemId).Count(&count).Error; err != nil {
+		r.logger.Error("failed to find item exists", "error", err)
+		return false
+	}
+	return count > 0
+}
+
 func (r *itemRepositoryImpl) Create(item *ItemEntity) (*ItemEntity, error) {
 	newItem := new(ItemEntity)
 
@@ -64,5 +73,9 @@ func (r *itemRepositoryImpl) Edit(item *ItemEntity) (*ItemEntity, error) {
 }
 
 func (r *itemRepositoryImpl) Archive(itemId int) error {
+	if err := r.db.Connect().Model(&ItemEntity{}).Where("ItemId = ?", itemId).Update("ActiveStatus", "UNAVAILABLE").Error; err != nil {
+		r.logger.Error("failed to archive item", "error", err)
+		return err
+	}
 	return nil
 }

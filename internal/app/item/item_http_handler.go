@@ -1,6 +1,9 @@
 package item
 
 import (
+	"errors"
+	"strconv"
+
 	"github.com/labstack/echo/v5"
 
 	"github.com/karan-khu/go-online-shop/pkg/res"
@@ -23,7 +26,7 @@ func (h *itemHttpHandlerImpl) GetAll(pctx *echo.Context) error {
 	}
 	if err := pctx.Bind(req); err != nil {
 		pctx.Logger().Error("failed to bind request", "error", err)
-		return res.BadRequest(pctx, "Invalid request", err)
+		return res.BadRequest(pctx, err)
 	}
 
 	list, err := h.itemUsecase.ItemList(req)
@@ -39,10 +42,10 @@ func (h *itemHttpHandlerImpl) Create(pctx *echo.Context) error {
 	req := new(RequestItemCreate)
 	if err := pctx.Bind(req); err != nil {
 		pctx.Logger().Error("failed to bind request", "error", err)
-		return res.BadRequest(pctx, "Invalid request", err)
+		return res.BadRequest(pctx, err)
 	}
 	if err := pctx.Validate(req); err != nil {
-		return res.BadRequest(pctx, "Invalid request", err)
+		return res.BadRequest(pctx, err)
 	}
 
 	item, err := h.itemUsecase.CreateItem(req)
@@ -58,10 +61,10 @@ func (h *itemHttpHandlerImpl) Edit(pctx *echo.Context) error {
 	req := new(RequestItemEdit)
 	if err := pctx.Bind(req); err != nil {
 		pctx.Logger().Error("failed to bind request", "error", err)
-		return res.BadRequest(pctx, "Invalid request", err)
+		return res.BadRequest(pctx, err)
 	}
 	if err := pctx.Validate(req); err != nil {
-		return res.BadRequest(pctx, "Invalid request", err)
+		return res.BadRequest(pctx, err)
 	}
 
 	item, err := h.itemUsecase.EditItem(req)
@@ -74,5 +77,19 @@ func (h *itemHttpHandlerImpl) Edit(pctx *echo.Context) error {
 }
 
 func (h *itemHttpHandlerImpl) Delete(pctx *echo.Context) error {
-	return nil
+	p_itemId := pctx.Param("item_id")
+	if p_itemId == "" {
+		return res.BadRequest(pctx, errors.New("item ID is required"))
+	}
+	itemId, ConvertErr := strconv.Atoi(p_itemId)
+	if ConvertErr != nil {
+		return res.BadRequest(pctx, ConvertErr)
+	}
+
+	if err := h.itemUsecase.DeleteItem(itemId); err != nil {
+		pctx.Logger().Error("failed to delete item", "error", err)
+		return res.BadRequest(pctx, err)
+	}
+
+	return res.Success(pctx, "Item deleted successfully", nil)
 }

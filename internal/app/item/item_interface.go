@@ -18,6 +18,7 @@ type ItemUsecase interface {
 
 type ItemRepository interface {
 	Listing(filter *RequestItemFilter) ([]*ItemEntity, int, error)
+	FindExists(itemId int) bool
 	Create(item *ItemEntity) (*ItemEntity, error)
 	Edit(item *ItemEntity) (*ItemEntity, error)
 	Archive(itemId int) error
