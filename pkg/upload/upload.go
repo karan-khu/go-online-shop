@@ -55,5 +55,5 @@ func SaveImage(pctx *echo.Context, uploadDir string) (string, error) {
 		return "", errors.New("failed to save: " + err.Error())
 	}
 
-	return "/uploads/" + file.Filename, nil
+	return "uploads/" + file.Filename, nil
 }
