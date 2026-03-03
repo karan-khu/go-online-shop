@@ -53,3 +53,26 @@ func (h *itemHttpHandlerImpl) Create(pctx *echo.Context) error {
 
 	return res.Success(pctx, "Item created successfully", item)
 }
+
+func (h *itemHttpHandlerImpl) Edit(pctx *echo.Context) error {
+	req := new(RequestItemEdit)
+	if err := pctx.Bind(req); err != nil {
+		pctx.Logger().Error("failed to bind request", "error", err)
+		return res.BadRequest(pctx, "Invalid request", err)
+	}
+	if err := pctx.Validate(req); err != nil {
+		return res.BadRequest(pctx, "Invalid request", err)
+	}
+
+	item, err := h.itemUsecase.EditItem(req)
+	if err != nil {
+		pctx.Logger().Error("failed to edit item", "error", err)
+		return res.InternalError(pctx, err)
+	}
+
+	return res.Success(pctx, "Item edited successfully", item)
+}
+
+func (h *itemHttpHandlerImpl) Delete(pctx *echo.Context) error {
+	return nil
+}

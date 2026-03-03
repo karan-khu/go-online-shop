@@ -7,7 +7,6 @@ import (
 
 type ItemModel struct {
 	ItemId      int    `json:"item_id"`
-	AdminId     int    `json:"admin_id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
 	Picture     string `json:"picture"`
@@ -42,6 +41,24 @@ func (r *RequestItemCreate) ToEntity() *ItemEntity {
 		r.Picture = src.Path
 	}
 	return &ItemEntity{
+		Name:        r.Name,
+		Description: r.Description,
+		Price:       r.Price,
+		Picture:     strings.TrimPrefix(r.Picture, "/"),
+	}
+}
+
+type RequestItemEdit struct {
+	ItemId int `json:"item_id" validate:"required"`
+	RequestItemCreate
+}
+
+func (r *RequestItemEdit) ToEntity() *ItemEntity {
+	if src, err := url.Parse(r.Picture); err == nil && src.Path != "" {
+		r.Picture = src.Path
+	}
+	return &ItemEntity{
+		ItemId:      r.ItemId,
 		Name:        r.Name,
 		Description: r.Description,
 		Price:       r.Price,

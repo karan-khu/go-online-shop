@@ -29,7 +29,6 @@ func (e *ItemEntity) ToModel(host string) *ItemModel {
 	}
 	return &ItemModel{
 		ItemId:      e.ItemId,
-		AdminId:     e.AdminId,
 		Name:        e.Name,
 		Description: e.Description,
 		Picture:     picture,

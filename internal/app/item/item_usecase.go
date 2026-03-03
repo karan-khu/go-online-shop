@@ -51,3 +51,17 @@ func (u *itemUsecaseImpl) CreateItem(req *RequestItemCreate) (*ItemModel, error)
 
 	return item.ToModel(u.host), nil
 }
+
+func (u *itemUsecaseImpl) EditItem(req *RequestItemEdit) (*ItemModel, error) {
+	item, err := u.itemRepo.Edit(req.ToEntity())
+	if err != nil {
+		u.logger.Error("failed to edit item", "error", err)
+		return nil, err
+	}
+
+	return item.ToModel(u.host), nil
+}
+
+func (u *itemUsecaseImpl) DeleteItem(itemId int) error {
+	return nil
+}

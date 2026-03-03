@@ -15,4 +15,5 @@ func RegisterRoutes(app *echo.Echo, conf *config.Config) {
 
 	router.GET("", itemHttpHandler.GetAll)
 	router.POST("/create", itemHttpHandler.Create)
+	router.PUT("/edit", itemHttpHandler.Edit)
 }

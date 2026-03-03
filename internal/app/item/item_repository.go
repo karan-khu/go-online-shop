@@ -54,7 +54,13 @@ func (r *itemRepositoryImpl) Create(item *ItemEntity) (*ItemEntity, error) {
 }
 
 func (r *itemRepositoryImpl) Edit(item *ItemEntity) (*ItemEntity, error) {
-	return nil, nil
+	newItem := new(ItemEntity)
+	if err := r.db.Connect().Updates(item).Scan(newItem).Where("ItemId = ?", item.ItemId).Error; err != nil {
+		r.logger.Error("failed to edit item", "error", err)
+		return nil, err
+	}
+
+	return newItem, nil
 }
 
 func (r *itemRepositoryImpl) Archive(itemId int) error {

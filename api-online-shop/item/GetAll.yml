@@ -5,19 +5,17 @@ info:
 
 http:
   method: GET
-  url: "{{BASE_URL}}/api/v1/items?search_text"
+  url: "{{BASE_URL}}/api/v1/items?search_text&page=3&limit=3"
   params:
     - name: search_text
       value: ""
       type: query
     - name: page
-      value: "1"
+      value: "3"
       type: query
-      disabled: true
     - name: limit
       value: "3"
       type: query
-      disabled: true
   auth: inherit
 
 settings:

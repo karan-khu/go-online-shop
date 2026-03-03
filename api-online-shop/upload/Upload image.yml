@@ -12,7 +12,7 @@ http:
       - name: file
         type: file
         value:
-          - /Users/ka12m/Downloads/blc-heat-pen.jpeg
+          - /Users/ka12m/Downloads/spell-tome.webp
   auth: inherit
 
 settings:
