@@ -1,21 +1,17 @@
 package item
 
 import (
-	"log/slog"
-
 	"github.com/labstack/echo/v5"
 
 	"github.com/karan-khu/go-online-shop/pkg/res"
 )
 
 type itemHttpHandlerImpl struct {
-	logger      *slog.Logger
 	itemUsecase ItemUsecase
 }
 
-func NewItemHttpHandler(logger *slog.Logger, itemUsecase ItemUsecase) ItemHttpHandler {
+func NewItemHttpHandler(itemUsecase ItemUsecase) ItemHttpHandler {
 	return &itemHttpHandlerImpl{
-		logger:      logger,
 		itemUsecase: itemUsecase,
 	}
 }

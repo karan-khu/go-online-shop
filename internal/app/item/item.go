@@ -11,7 +11,7 @@ func RegisterRoutes(app *echo.Echo, conf *config.Config) {
 
 	itemRepo := NewItemRepository(app.Logger, conf)
 	itemUsecase := NewItemUsecase(app.Logger, itemRepo, conf)
-	itemHttpHandler := NewItemHttpHandler(app.Logger, itemUsecase)
+	itemHttpHandler := NewItemHttpHandler(itemUsecase)
 
 	router.GET("", itemHttpHandler.GetAll)
 }
