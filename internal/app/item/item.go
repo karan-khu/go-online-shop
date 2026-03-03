@@ -14,4 +14,5 @@ func RegisterRoutes(app *echo.Echo, conf *config.Config) {
 	itemHttpHandler := NewItemHttpHandler(itemUsecase)
 
 	router.GET("", itemHttpHandler.GetAll)
+	router.POST("/create", itemHttpHandler.Create)
 }

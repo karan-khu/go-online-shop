@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -43,7 +44,7 @@ func main() {
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
 		}
-		return c.JSON(http.StatusOK, map[string]string{"url": path})
+		return c.JSON(http.StatusOK, map[string]string{"url": path, "fullPath": fmt.Sprintf("%s/%s", conf.Env.APP_HOST, path)})
 	})
 	app.GET("/api/v1/health", func(c *echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]string{"message": "Server is running!"})

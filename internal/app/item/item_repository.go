@@ -41,3 +41,22 @@ func (r *itemRepositoryImpl) Listing(req *RequestItemFilter) ([]*ItemEntity, int
 	}
 	return list, int(totalCount), nil
 }
+
+func (r *itemRepositoryImpl) Create(item *ItemEntity) (*ItemEntity, error) {
+	newItem := new(ItemEntity)
+
+	if err := r.db.Connect().Create(item).Scan(newItem).Error; err != nil {
+		r.logger.Error("failed to create item", "error", err)
+		return nil, err
+	}
+
+	return newItem, nil
+}
+
+func (r *itemRepositoryImpl) Edit(item *ItemEntity) (*ItemEntity, error) {
+	return nil, nil
+}
+
+func (r *itemRepositoryImpl) Archive(itemId int) error {
+	return nil
+}

@@ -14,6 +14,8 @@ var allowedExt = map[string]bool{
 	".jpg":  true,
 	".jpeg": true,
 	".png":  true,
+	".gif":  true,
+	".webp": true,
 }
 
 func SaveImage(pctx *echo.Context, uploadDir string) (string, error) {

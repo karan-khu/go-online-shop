@@ -41,3 +41,13 @@ func (u *itemUsecaseImpl) ItemList(req *RequestItemFilter) (*ResponseItemList, e
 		},
 	}, nil
 }
+
+func (u *itemUsecaseImpl) CreateItem(req *RequestItemCreate) (*ItemModel, error) {
+	item, err := u.itemRepo.Create(req.ToEntity())
+	if err != nil {
+		u.logger.Error("failed to create item", "error", err)
+		return nil, err
+	}
+
+	return item.ToModel(u.host), nil
+}
