@@ -1,0 +1,10 @@
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore temp directory
+tmp/
+vendor/
+.env
+.env*

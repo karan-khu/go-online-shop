@@ -22,9 +22,11 @@ type Env struct {
 }
 
 func NewEnv() *Env {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file", err)
+	if os.Getenv("CI") != "true" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatal("Error loading .env file", err)
+		}
 	}
 
 	return &Env{
