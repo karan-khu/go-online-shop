@@ -9,6 +9,10 @@ import (
 	"gorm.io/gorm"
 )
 
+type Database interface {
+	Connect() *gorm.DB
+}
+
 type sqlServerDatabase struct {
 	*gorm.DB
 }
@@ -18,7 +22,7 @@ var (
 	once     sync.Once
 )
 
-func NewSqlServerDatabase(host, user, pass, db string) sqlServerDatabase {
+func NewSqlServerDatabase(host, user, pass, db string) Database {
 	once.Do(func() {
 		connStr := fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s", host, user, pass, db)
 
@@ -32,5 +36,9 @@ func NewSqlServerDatabase(host, user, pass, db string) sqlServerDatabase {
 		instance = &sqlServerDatabase{conn}
 	})
 
-	return *instance
+	return instance
+}
+
+func (d *sqlServerDatabase) Connect() *gorm.DB {
+	return instance.DB
 }

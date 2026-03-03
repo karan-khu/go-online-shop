@@ -3,7 +3,7 @@ package config
 import (
 	"log"
 
-	"gorm.io/gorm"
+	"github.com/karan-khu/go-online-shop/pkg/database"
 )
 
 type Config struct {
@@ -21,7 +21,7 @@ func NewConfig() *Config {
 	}
 }
 
-func (c *Config) GetDb(name string) *gorm.DB {
+func (c *Config) GetDb(name string) database.Database {
 	if db, ok := c.database.dbs[name]; ok {
 		return db
 	}
