@@ -20,8 +20,8 @@ func NewItemUsecase(logger *slog.Logger, itemRepo ItemRepository, conf *config.C
 	}
 }
 
-func (u *itemUsecaseImpl) ItemList() ([]*ItemModel, error) {
-	list, err := u.itemRepo.Listing()
+func (u *itemUsecaseImpl) ItemList(req *RequestItemFilter) ([]*ItemModel, error) {
+	list, err := u.itemRepo.Listing(req)
 	if err != nil {
 		u.logger.Error("failed to get item list", "error", err)
 		return nil, err

@@ -17,7 +17,12 @@ func NewItemHttpHandler(itemUsecase ItemUsecase) ItemHttpHandler {
 }
 
 func (h *itemHttpHandlerImpl) GetAll(c *echo.Context) error {
-	list, err := h.itemUsecase.ItemList()
+	req := new(RequestItemFilter)
+	if err := c.Bind(req); err != nil {
+		return res.BadRequest(c, "Invalid request", err)
+	}
+
+	list, err := h.itemUsecase.ItemList(req)
 	if err != nil {
 		return res.InternalError(c, err)
 	}

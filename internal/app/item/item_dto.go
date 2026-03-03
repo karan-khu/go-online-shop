@@ -8,3 +8,7 @@ type ItemModel struct {
 	Picture     string `json:"picture"`
 	Price       int    `json:"price"`
 }
+
+type RequestItemFilter struct {
+	SearchText string `query:"search_text"`
+}

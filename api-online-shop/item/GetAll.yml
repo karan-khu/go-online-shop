@@ -5,7 +5,11 @@ info:
 
 http:
   method: GET
-  url: "{{BASE_URL}}/api/v1/item"
+  url: "{{BASE_URL}}/api/v1/items?search_text=sword"
+  params:
+    - name: search_text
+      value: sword
+      type: query
   auth: inherit
 
 settings:

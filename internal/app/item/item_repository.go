@@ -20,8 +20,14 @@ func NewItemRepository(logger *slog.Logger, conf *config.Config) ItemRepository 
 	}
 }
 
-func (r *itemRepositoryImpl) Listing() (list []*ItemEntity, err error) {
-	err = r.db.Model(&ItemEntity{}).Find(&list).Error
+func (r *itemRepositoryImpl) Listing(req *RequestItemFilter) (list []*ItemEntity, err error) {
+	query := r.db.Model(&ItemEntity{})
+	if req.SearchText != "" {
+		searchText := "%" + req.SearchText + "%"
+		query = query.Where("Name LIKE ? OR Description LIKE ?", searchText, searchText)
+	}
+
+	err = query.Find(&list).Error
 	if err != nil {
 		r.logger.Error("failed to get item listing", "error", err)
 		return nil, err
