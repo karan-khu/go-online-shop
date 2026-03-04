@@ -4,9 +4,9 @@ import "time"
 
 type UserEntity struct {
 	UserId       int       `gorm:"column:UserId;primaryKey;autoIncrement"`
-	Username     string    `gorm:"column:Username;size:255"`
 	FullName     string    `gorm:"column:FullName;size:255"`
 	Email        string    `gorm:"column:Email;size:255"`
+	Picture      string    `gorm:"column:Picture;size:255"`
 	Role         string    `gorm:"column:Role;size:10;comment:ADMIN/USER"`
 	ActiveStatus string    `gorm:"column:ActiveStatus;size:20;default:AVAILABLE"`
 	CreatedAt    time.Time `gorm:"column:CreatedAt;autoCreateTime"`

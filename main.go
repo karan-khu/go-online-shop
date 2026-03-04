@@ -15,6 +15,7 @@ import (
 	"github.com/labstack/echo/v5/middleware"
 
 	"github.com/karan-khu/go-online-shop/config"
+	"github.com/karan-khu/go-online-shop/internal/app/auth"
 	"github.com/karan-khu/go-online-shop/internal/app/item"
 	md "github.com/karan-khu/go-online-shop/internal/middleware"
 	"github.com/karan-khu/go-online-shop/pkg/upload"
@@ -51,6 +52,7 @@ func main() {
 	})
 
 	item.RegisterRoutes(app, conf)
+	auth.RegisterRoutes(app, conf)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

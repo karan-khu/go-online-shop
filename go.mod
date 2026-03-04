@@ -6,11 +6,13 @@ require (
 	github.com/go-playground/validator/v10 v10.30.1
 	github.com/joho/godotenv v1.5.1
 	github.com/labstack/echo/v5 v5.0.4
+	golang.org/x/oauth2 v0.35.0
 	gorm.io/driver/sqlserver v1.6.3
 	gorm.io/gorm v1.31.1
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.3.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
