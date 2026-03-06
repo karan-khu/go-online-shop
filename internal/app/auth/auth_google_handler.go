@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v5"
-	"golang.org/x/oauth2"
 
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/pkg/res"
@@ -48,11 +47,7 @@ func (h *AuthGoogleHandlerImpl) GoogleLogin(pctx *echo.Context) error {
 		HttpOnly: true,
 	})
 
-	authURL := h.oauth2Config.GoogleOAuth2Config.AuthCodeURL(state,
-		oauth2.AccessTypeOffline,
-		oauth2.SetAuthURLParam("prompt", "consent"),
-	)
-	return pctx.Redirect(http.StatusFound, authURL)
+	return pctx.Redirect(http.StatusFound, h.oauth2Config.GoogleOAuth2Config.AuthCodeURL(state))
 }
 
 func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {

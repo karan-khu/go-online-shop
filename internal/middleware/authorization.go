@@ -100,20 +100,17 @@ func (m *AuthorizationMiddlewareImpl) tokenRefreshing(pctx *echo.Context, token 
 
 func (m *AuthorizationMiddlewareImpl) getToken(pctx *echo.Context) (*oauth2.Token, error) {
 	accessToken, err := pctx.Request().Cookie(m.oauth2.AccessTokenKey)
-	if err != nil {
-		m.logger.Error("Failed to get access token", "error", err)
-		return nil, err
-	}
-	refreshToken, err := pctx.Request().Cookie(m.oauth2.RefreshTokenKey)
-	if err != nil {
-		m.logger.Error("Failed to get refresh token", "error", err)
-		return nil, err
+	if err == nil {
+		refreshToken, err := pctx.Request().Cookie(m.oauth2.RefreshTokenKey)
+		if err == nil {
+			return &oauth2.Token{
+				AccessToken:  accessToken.Value,
+				RefreshToken: refreshToken.Value,
+			}, nil
+		}
 	}
 
-	return &oauth2.Token{
-		AccessToken:  accessToken.Value,
-		RefreshToken: refreshToken.Value,
-	}, nil
+	return nil, errors.New("Unauthorized")
 }
 
 func (m *AuthorizationMiddlewareImpl) getUserInfo(client *http.Client) (*auth.UserCredential, error) {

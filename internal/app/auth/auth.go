@@ -13,4 +13,5 @@ func RegisterRoutes(app *echo.Echo, conf *config.Config, authUsecase AuthGoogleU
 
 	router.GET("/google/login", authGoogleHandler.GoogleLogin)
 	router.GET("/google/callback", authGoogleHandler.GoogleLoginCallBack)
+	router.POST("/google/logout", authGoogleHandler.Logout)
 }

@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 )
 
 var (
@@ -27,7 +26,12 @@ func NewGoogleOAuth2Config(env *Env) *Oauth2Config {
 			ClientSecret: env.GOOGLE_CLIENT_SECRET,
 			RedirectURL:  env.GOOGLE_REDIRECT_URL,
 			Scopes:       strings.Split(env.GOOGLE_SCOPES, ","),
-			Endpoint:     google.Endpoint,
+			Endpoint: oauth2.Endpoint{
+				AuthURL:       env.GOOGLE_AUTH_URL,
+				TokenURL:      env.GOOGLE_TOKEN_URL,
+				DeviceAuthURL: env.GOOGLE_DEVICE_AUTH_URL,
+				AuthStyle:     oauth2.AuthStyleInParams,
+			},
 		}
 	})
 	return &Oauth2Config{
