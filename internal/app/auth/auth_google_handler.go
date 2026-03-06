@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log/slog"
 	"math/rand"
@@ -58,21 +59,20 @@ func (h *AuthGoogleHandlerImpl) GoogleLogin(pctx *echo.Context) error {
 
 	h.setCookie(pctx, stateCookieName, state)
 
-	return pctx.Redirect(http.StatusFound, googleOAuth2Config.AuthCodeURL(state))
+	authURL := googleOAuth2Config.AuthCodeURL(state, oauth2.SetAuthURLParam("prompt", "select_account"))
+	return pctx.Redirect(http.StatusFound, authURL)
 }
 
 func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 	ctx := context.Background()
 
-	errValidate := errors.New("")
-	const MAX_ATTEMPTS = 3
-	const DELAY = 1 * time.Second
-	for attempt := 0; attempt < MAX_ATTEMPTS; attempt++ {
+	var errValidate error
+	for range 3 {
 		errValidate = (h.callbackValidating(pctx))
 		if errValidate == nil {
 			break
 		}
-		time.Sleep(DELAY)
+		time.Sleep(1 * time.Second)
 	}
 	if errValidate != nil {
 		h.logger.Error("Failed to validate callback", "error", errValidate)
@@ -103,11 +103,25 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 	h.setSameSiteCookie(pctx, accessTokenCookieName, token.AccessToken)
 	h.setSameSiteCookie(pctx, refreshTokenCookieName, token.RefreshToken)
 
-	return res.Success(pctx, "Logged in successfully", nil)
+	return res.Success(pctx, "Logged in successfully", userInfo)
 }
 
 func (h *AuthGoogleHandlerImpl) Logout(pctx *echo.Context) error {
-	panic("unimplemented")
+	accessToken, err := pctx.Request().Cookie(accessTokenCookieName)
+	if err != nil {
+		h.logger.Error("Access token cookie not found", "error", err)
+		return res.BadRequest(pctx, err)
+	}
+
+	if err := h.revokeToken(accessToken.Value); err != nil {
+		h.logger.Error("Failed to revoke token", "error", err)
+		return res.InternalError(pctx, err)
+	}
+
+	h.removeCookie(pctx, accessTokenCookieName)
+	h.removeCookie(pctx, refreshTokenCookieName)
+
+	return res.Success(pctx, "Logged out successfully", nil)
 }
 
 func (h *AuthGoogleHandlerImpl) UserAuthorizing(pctx *echo.Context, next echo.HandlerFunc) error {
@@ -194,4 +208,19 @@ func (h *AuthGoogleHandlerImpl) getUserInfo(client *http.Client) (*UserCredentia
 	}
 
 	return userInfo, nil
+}
+
+func (h *AuthGoogleHandlerImpl) revokeToken(token string) error {
+	revokeUrl := fmt.Sprintf("%s?token=%s", h.env.GOOGLE_REVOKE_TOKEN_URL, token)
+
+	resp, err := http.Post(revokeUrl, "application/x-www-form-urlencoded", nil)
+	if err != nil {
+		h.logger.Error("Failed to revoke token", "error", err)
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	return nil
+
 }

@@ -6,12 +6,3 @@ type UserLoginRequest struct {
 	FullName string
 	Picture  string
 }
-
-func (u *UserLoginRequest) ToUserEntity() *UserEntity {
-	return &UserEntity{
-		UserId:   u.ID,
-		Email:    u.Email,
-		FullName: u.FullName,
-		Picture:  u.Picture,
-	}
-}

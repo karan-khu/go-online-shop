@@ -21,11 +21,12 @@ type Env struct {
 	DB_PASSWORD string
 	DB_NAME     string
 
-	GOOGLE_CLIENT_ID     string
-	GOOGLE_CLIENT_SECRET string
-	GOOGLE_REDIRECT_URL  string
-	GOOGLE_SCOPES        string
-	GOOGLE_USER_INFO_URL string
+	GOOGLE_CLIENT_ID        string
+	GOOGLE_CLIENT_SECRET    string
+	GOOGLE_REDIRECT_URL     string
+	GOOGLE_SCOPES           string
+	GOOGLE_USER_INFO_URL    string
+	GOOGLE_REVOKE_TOKEN_URL string
 }
 
 func NewEnv() *Env {
@@ -50,11 +51,12 @@ func NewEnv() *Env {
 		DB_PASSWORD: getEnv("DB_PASSWORD", "", true),
 		DB_NAME:     getEnv("DB_NAME", "db-online-shop", false),
 
-		GOOGLE_CLIENT_ID:     getEnv("GOOGLE_CLIENT_ID", "", true),
-		GOOGLE_CLIENT_SECRET: getEnv("GOOGLE_CLIENT_SECRET", "", true),
-		GOOGLE_REDIRECT_URL:  getEnv("GOOGLE_REDIRECT_URL", "", true),
-		GOOGLE_SCOPES:        getEnv("GOOGLE_SCOPES", "", true),
-		GOOGLE_USER_INFO_URL: getEnv("GOOGLE_USER_INFO_URL", "", true),
+		GOOGLE_CLIENT_ID:        getEnv("GOOGLE_CLIENT_ID", "", true),
+		GOOGLE_CLIENT_SECRET:    getEnv("GOOGLE_CLIENT_SECRET", "", true),
+		GOOGLE_REDIRECT_URL:     getEnv("GOOGLE_REDIRECT_URL", "", true),
+		GOOGLE_SCOPES:           getEnv("GOOGLE_SCOPES", "", true),
+		GOOGLE_USER_INFO_URL:    getEnv("GOOGLE_USER_INFO_URL", "", true),
+		GOOGLE_REVOKE_TOKEN_URL: getEnv("GOOGLE_REVOKE_TOKEN_URL", "", true),
 	}
 }
 
