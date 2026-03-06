@@ -54,7 +54,42 @@ func (h *AuthGoogleHandlerImpl) GoogleLogin(pctx *echo.Context) error {
 }
 
 func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
-	panic("unimplemented")
+	panic("")
+	// ctx := context.Background()
+
+	// if err := retry.Do(func() error {
+	// 	return h.callbackValidating(pctx)
+	// }, retry.Attempts(3), retry.Delay(1*time.Second)); err != nil {
+	// 	h.logger.Error("Failed to validate callback: %s", err.Error())
+	// 	return res.BadRequest(pctx, err)
+	// }
+
+	// token, err := googleOAuth2Config.Exchange(ctx, pctx.QueryParam("code"))
+	// if err != nil {
+	// 	h.logger.Error("Failed to exchange token: %s", err.Error())
+	// 	return res.Unauthorized(pctx, err)
+	// }
+
+	// client := googleOAuth2Config.Client(ctx, token)
+
+	// userInfo, err := h.getUserInfo(client)
+	// if err != nil {
+	// 	h.logger.Error("Failed to get user info: %s", err.Error())
+	// 	return res.Unauthorized(pctx, err)
+	// }
+
+	// userReq := new(UserCredential)
+	// copier.Copy(userReq, &userInfo)
+	// playerReq.Avatar = userInfo.Picture
+	// if err := pctx.oauth2Service.PlayerAccountCreate(playerReq); err != nil {
+	// 	pctx.logger.Errorf("Failed to get user info: %s", err.Error())
+	// 	return custom.Error(pctx, http.StatusUnauthorized, err.Error())
+	// }
+
+	// pctx.setSameSiteCookie(pctx, accessTokenCookieName, token.AccessToken)
+	// pctx.setSameSiteCookie(pctx, refreshTokenCookieName, token.RefreshToken)
+
+	// return pctx.JSON(http.StatusOK, &_oauth2Model.LoginResponse{Message: "Login success"})
 }
 
 func (h *AuthGoogleHandlerImpl) Logout(pctx *echo.Context) error {

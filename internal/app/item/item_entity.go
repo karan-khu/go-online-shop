@@ -7,7 +7,7 @@ import (
 
 type ItemEntity struct {
 	ItemId       int       `gorm:"column:ItemId;primaryKey;autoIncrement"`
-	AdminId      int       `gorm:"column:AdminId"`
+	AdminId      string    `gorm:"column:AdminId"`
 	Name         string    `gorm:"column:Name;size:255"`
 	Description  string    `gorm:"column:Description;size:max"`
 	Picture      string    `gorm:"column:Picture"`
