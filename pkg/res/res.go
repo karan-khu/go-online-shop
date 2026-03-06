@@ -28,6 +28,14 @@ func BadRequest(pctx *echo.Context, err error) error {
 	})
 }
 
+func Unauthorized(pctx *echo.Context, err error) error {
+	return pctx.JSON(http.StatusUnauthorized, &Response{
+		Status:  false,
+		Message: err.Error(),
+		Result:  nil,
+	})
+}
+
 func NotFound(pctx *echo.Context, err error) error {
 	return pctx.JSON(http.StatusNotFound, &Response{
 		Status:  false,
