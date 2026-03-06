@@ -15,9 +15,37 @@ config:
       bypassProxy: ""
 
 request:
+  auth:
+    type: oauth2
+    flow: authorization_code
+    authorizationUrl: https://accounts.google.com/o/oauth2/auth?access_type=offline&prompt=consent
+    accessTokenUrl: https://oauth2.googleapis.com/token
+    callbackUrl: https://oauth.usebruno.com/callback
+    credentials:
+      # Replace with your Google OAuth credentials or use Bruno env variables
+      clientId: "{{GOOGLE_CLIENT_ID}}"
+      clientSecret: "{{GOOGLE_CLIENT_SECRET}}"
+      placement: body
+    scope: openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
+    settings:
+      autoFetchToken: true
+      autoRefreshToken: false
   variables:
     - name: ""
       value: ""
+  scripts:
+    - type: before-request
+      code: |-
+        const accessToken = bru.getOauth2CredentialVar("$oauth2.credentials.access_token")
+        const refreshToken = bru.getOauth2CredentialVar("$oauth2.credentials.refresh_token")
+
+        const baseUrl = bru.getEnvVar("BASE_URL");
+
+        if (accessToken || refreshToken) {
+          const jar = bru.cookies.jar();
+          if (accessToken) jar.setCookie(baseUrl, "ACCESS_TOKEN", accessToken);
+          if (refreshToken) jar.setCookie(baseUrl, "REFRESH_TOKEN", refreshToken);
+        }
 bundled: false
 extensions:
   bruno:
