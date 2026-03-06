@@ -9,57 +9,49 @@ import (
 	"log/slog"
 	"math/rand"
 	"net/http"
-	"strings"
-	"sync"
 	"time"
 
 	"github.com/labstack/echo/v5"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/pkg/res"
 )
 
 var (
-	googleOAuth2Config *oauth2.Config
-	once               sync.Once
-
-	accessTokenCookieName  = "ACCESS_TOKEN"
-	refreshTokenCookieName = "REFRESH_TOKEN"
-	stateCookieName        = "STATE"
-
 	letters = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-
-	googleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo"
 )
 
 type AuthGoogleHandlerImpl struct {
 	logger            *slog.Logger
 	env               *config.Env
+	oauth2Config      *config.Oauth2Config
 	authGoogleUsecase AuthGoogleUsecase
 }
 
 func NewAuthGoogleHandler(logger *slog.Logger, conf *config.Config, authGoogleUsecase AuthGoogleUsecase) AuthGoogleHandler {
-	once.Do(func() {
-		scopes := strings.Split(conf.Env.GOOGLE_SCOPES, ",")
-		googleOAuth2Config = &oauth2.Config{
-			ClientID:     conf.Env.GOOGLE_CLIENT_ID,
-			ClientSecret: conf.Env.GOOGLE_CLIENT_SECRET,
-			RedirectURL:  conf.Env.GOOGLE_REDIRECT_URL,
-			Scopes:       scopes,
-			Endpoint:     google.Endpoint,
-		}
-	})
-	return &AuthGoogleHandlerImpl{logger, conf.Env, authGoogleUsecase}
+	return &AuthGoogleHandlerImpl{
+		logger:            logger,
+		env:               conf.Env,
+		authGoogleUsecase: authGoogleUsecase,
+		oauth2Config:      conf.Oauth2Config,
+	}
 }
 
 func (h *AuthGoogleHandlerImpl) GoogleLogin(pctx *echo.Context) error {
 	state := randomState()
 
-	h.setCookie(pctx, stateCookieName, state)
+	pctx.SetCookie(&http.Cookie{
+		Name:     h.oauth2Config.StateCookieName,
+		Value:    state,
+		Path:     "/",
+		HttpOnly: true,
+	})
 
-	authURL := googleOAuth2Config.AuthCodeURL(state, oauth2.SetAuthURLParam("prompt", "select_account"))
+	authURL := h.oauth2Config.GoogleOAuth2Config.AuthCodeURL(state,
+		oauth2.AccessTypeOffline,
+		oauth2.SetAuthURLParam("prompt", "consent"),
+	)
 	return pctx.Redirect(http.StatusFound, authURL)
 }
 
@@ -68,7 +60,7 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 
 	var errValidate error
 	for range 3 {
-		errValidate = (h.callbackValidating(pctx))
+		errValidate = h.callbackValidating(pctx)
 		if errValidate == nil {
 			break
 		}
@@ -79,13 +71,13 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 		return res.Unauthorized(pctx, errValidate)
 	}
 
-	token, err := googleOAuth2Config.Exchange(ctx, pctx.QueryParam("code"))
+	token, err := h.oauth2Config.GoogleOAuth2Config.Exchange(ctx, pctx.QueryParam("code"))
 	if err != nil {
 		h.logger.Error("Failed to exchange token", "error", err)
 		return res.Unauthorized(pctx, err)
 	}
 
-	client := googleOAuth2Config.Client(ctx, token)
+	client := h.oauth2Config.GoogleOAuth2Config.Client(ctx, token)
 
 	userInfo, err := h.getUserInfo(client)
 	if err != nil {
@@ -100,14 +92,23 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 		return res.Unauthorized(pctx, err)
 	}
 
-	h.setSameSiteCookie(pctx, accessTokenCookieName, token.AccessToken)
-	h.setSameSiteCookie(pctx, refreshTokenCookieName, token.RefreshToken)
-
+	pctx.SetCookie(&http.Cookie{
+		Name:     h.oauth2Config.AccessTokenKey,
+		Value:    token.AccessToken,
+		Path:     "/",
+		HttpOnly: true,
+	})
+	pctx.SetCookie(&http.Cookie{
+		Name:     h.oauth2Config.RefreshTokenKey,
+		Value:    token.RefreshToken,
+		Path:     "/",
+		HttpOnly: true,
+	})
 	return res.Success(pctx, "Logged in successfully", userInfo)
 }
 
 func (h *AuthGoogleHandlerImpl) Logout(pctx *echo.Context) error {
-	accessToken, err := pctx.Request().Cookie(accessTokenCookieName)
+	accessToken, err := pctx.Request().Cookie(h.oauth2Config.AccessTokenKey)
 	if err != nil {
 		h.logger.Error("Access token cookie not found", "error", err)
 		return res.BadRequest(pctx, err)
@@ -118,14 +119,19 @@ func (h *AuthGoogleHandlerImpl) Logout(pctx *echo.Context) error {
 		return res.InternalError(pctx, err)
 	}
 
-	h.removeCookie(pctx, accessTokenCookieName)
-	h.removeCookie(pctx, refreshTokenCookieName)
-
+	pctx.SetCookie(&http.Cookie{
+		Name:     h.oauth2Config.AccessTokenKey,
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   -1,
+	})
+	pctx.SetCookie(&http.Cookie{
+		Name:     h.oauth2Config.RefreshTokenKey,
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   -1,
+	})
 	return res.Success(pctx, "Logged out successfully", nil)
-}
-
-func (h *AuthGoogleHandlerImpl) UserAuthorizing(pctx *echo.Context, next echo.HandlerFunc) error {
-	panic("unimplemented")
 }
 
 func randomState() string {
@@ -136,45 +142,10 @@ func randomState() string {
 	return string(b)
 }
 
-func (h *AuthGoogleHandlerImpl) setCookie(pctx *echo.Context, name, value string) {
-	isProduction := h.env.GO_ENV == "production"
-	cookie := http.Cookie{
-		Name:     name,
-		Value:    value,
-		Path:     "/",
-		HttpOnly: true,
-		Secure:   isProduction,
-	}
-	pctx.SetCookie(&cookie)
-}
-
-func (h *AuthGoogleHandlerImpl) removeCookie(pctx *echo.Context, name string) {
-	cookie := http.Cookie{
-		Name:     name,
-		Path:     "/",
-		HttpOnly: true,
-		MaxAge:   -1,
-	}
-	pctx.SetCookie(&cookie)
-}
-
-func (h *AuthGoogleHandlerImpl) setSameSiteCookie(pctx *echo.Context, name, value string) {
-	isProduction := h.env.GO_ENV == "production"
-	cookie := http.Cookie{
-		Name:     name,
-		Value:    value,
-		Path:     "/",
-		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
-		Secure:   isProduction,
-	}
-	pctx.SetCookie(&cookie)
-}
-
 func (h *AuthGoogleHandlerImpl) callbackValidating(pctx *echo.Context) error {
 	state := pctx.QueryParam("state")
 
-	stateFromCookie, err := pctx.Request().Cookie(stateCookieName)
+	stateFromCookie, err := pctx.Request().Cookie(h.oauth2Config.StateCookieName)
 	if err != nil {
 		h.logger.Error("State cookie not found", "error", err)
 		return errors.New("Error: State cookie not found")
@@ -185,7 +156,12 @@ func (h *AuthGoogleHandlerImpl) callbackValidating(pctx *echo.Context) error {
 		return errors.New("Error: State mismatch")
 	}
 
-	h.removeCookie(pctx, stateCookieName)
+	pctx.SetCookie(&http.Cookie{
+		Name:     h.oauth2Config.StateCookieName,
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   -1,
+	})
 
 	return nil
 }

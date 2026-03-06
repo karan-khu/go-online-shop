@@ -9,7 +9,7 @@ type AuthUserAdapter struct {
 	userRepo user.UserRepository
 }
 
-func NewAuthUserAdapter(userRepo user.UserRepository) auth.UserCreator {
+func NewAuthUserAdapter(userRepo user.UserRepository) auth.UserCreatorAdapter {
 	return &AuthUserAdapter{userRepo: userRepo}
 }
 

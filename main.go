@@ -53,12 +53,13 @@ func main() {
 		return c.JSON(http.StatusOK, map[string]string{"message": "Server is running!"})
 	})
 
-	item.RegisterRoutes(app, conf)
-
 	userRepo := user.NewUserRepository(app.Logger, conf)
 	userCreator := adapter.NewAuthUserAdapter(userRepo)
 	authUsecase := auth.NewAuthGoogleUsecase(userCreator)
+	authMiddleware := md.NewAuthorizationMiddleware(app.Logger, conf, authUsecase)
+
 	auth.RegisterRoutes(app, conf, authUsecase)
+	item.RegisterRoutes(app, conf, authMiddleware)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

@@ -8,6 +8,14 @@ http:
   url: "{{BASE_URL}}/api/v1/auth/google/callback"
   auth: inherit
 
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        const jar = bruno.cookies.jar();
+
+        jar.setCookie(BASE_URL, "STATE", "");
+
 settings:
   encodeUrl: true
   timeout: 0

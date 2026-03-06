@@ -6,15 +6,14 @@ type AuthGoogleHandler interface {
 	GoogleLogin(pctx *echo.Context) error
 	GoogleLoginCallBack(pctx *echo.Context) error
 	Logout(pctx *echo.Context) error
-
-	UserAuthorizing(pctx *echo.Context, next echo.HandlerFunc) error
 }
 
 type AuthGoogleUsecase interface {
 	UserLogin(userReq *UserLoginRequest) error
+	UserExists(userID string) bool
 }
 
-type UserCreator interface {
+type UserCreatorAdapter interface {
 	CreateUser(req *UserLoginRequest) error
 	UserExists(userID string) bool
 }
