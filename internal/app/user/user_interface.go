@@ -6,5 +6,5 @@ type UserUseCase interface{}
 
 type UserRepository interface {
 	Creating(user *UserEntity) (*UserEntity, error)
-	FindById(userId int) (*UserEntity, error)
+	FindById(userId string) (*UserEntity, error)
 }

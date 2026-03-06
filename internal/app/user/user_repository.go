@@ -30,7 +30,7 @@ func (r *UserRepositoryImpl) Creating(user *UserEntity) (*UserEntity, error) {
 	return newUser, nil
 }
 
-func (r *UserRepositoryImpl) FindById(userId int) (*UserEntity, error) {
+func (r *UserRepositoryImpl) FindById(userId string) (*UserEntity, error) {
 	user := new(UserEntity)
 	if err := r.db.Connect().Where("UserId = ?", userId).First(user).Error; err != nil {
 		r.logger.Error("failed to find user by id", "error", err)

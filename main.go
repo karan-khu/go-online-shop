@@ -15,8 +15,10 @@ import (
 	"github.com/labstack/echo/v5/middleware"
 
 	"github.com/karan-khu/go-online-shop/config"
+	"github.com/karan-khu/go-online-shop/internal/adapter"
 	"github.com/karan-khu/go-online-shop/internal/app/auth"
 	"github.com/karan-khu/go-online-shop/internal/app/item"
+	"github.com/karan-khu/go-online-shop/internal/app/user"
 	md "github.com/karan-khu/go-online-shop/internal/middleware"
 	"github.com/karan-khu/go-online-shop/pkg/upload"
 	"github.com/karan-khu/go-online-shop/pkg/validator"
@@ -52,7 +54,11 @@ func main() {
 	})
 
 	item.RegisterRoutes(app, conf)
-	auth.RegisterRoutes(app, conf)
+
+	userRepo := user.NewUserRepository(app.Logger, conf)
+	userCreator := adapter.NewAuthUserAdapter(userRepo)
+	authUsecase := auth.NewAuthGoogleUsecase(userCreator)
+	auth.RegisterRoutes(app, conf, authUsecase)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

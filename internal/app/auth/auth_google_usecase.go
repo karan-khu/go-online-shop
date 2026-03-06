@@ -1,17 +1,20 @@
 package auth
 
-import "github.com/karan-khu/go-online-shop/internal/app/user"
-
 type AuthGoogleUsecaseImpl struct {
-	userRepo user.UserRepository
+	userCreator UserCreator
 }
 
-func NewAuthGoogleUsecase(userRepo user.UserRepository) AuthGoogleUsecase {
+func NewAuthGoogleUsecase(userCreator UserCreator) AuthGoogleUsecase {
 	return &AuthGoogleUsecaseImpl{
-		userRepo: userRepo,
+		userCreator: userCreator,
 	}
 }
 
-func (u *AuthGoogleUsecaseImpl) UserLogin(credential *UserCredential) error {
-	panic("unimplemented")
+func (u *AuthGoogleUsecaseImpl) UserLogin(userReq *UserLoginRequest) error {
+	if !u.userCreator.UserExists(userReq.ID) {
+		if err := u.userCreator.CreateUser(userReq); err != nil {
+			return err
+		}
+	}
+	return nil
 }

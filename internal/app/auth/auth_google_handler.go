@@ -1,17 +1,23 @@
 package auth
 
 import (
+	"context"
+	"encoding/json"
+	"errors"
+	"io"
 	"log/slog"
 	"math/rand"
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/labstack/echo/v5"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 
 	"github.com/karan-khu/go-online-shop/config"
+	"github.com/karan-khu/go-online-shop/pkg/res"
 )
 
 var (
@@ -23,6 +29,8 @@ var (
 	stateCookieName        = "STATE"
 
 	letters = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+	googleUserInfoURL = "https://www.googleapis.com/oauth2/v2/userinfo"
 )
 
 type AuthGoogleHandlerImpl struct {
@@ -54,42 +62,48 @@ func (h *AuthGoogleHandlerImpl) GoogleLogin(pctx *echo.Context) error {
 }
 
 func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
-	panic("")
-	// ctx := context.Background()
+	ctx := context.Background()
 
-	// if err := retry.Do(func() error {
-	// 	return h.callbackValidating(pctx)
-	// }, retry.Attempts(3), retry.Delay(1*time.Second)); err != nil {
-	// 	h.logger.Error("Failed to validate callback: %s", err.Error())
-	// 	return res.BadRequest(pctx, err)
-	// }
+	errValidate := errors.New("")
+	const MAX_ATTEMPTS = 3
+	const DELAY = 1 * time.Second
+	for attempt := 0; attempt < MAX_ATTEMPTS; attempt++ {
+		errValidate = (h.callbackValidating(pctx))
+		if errValidate == nil {
+			break
+		}
+		time.Sleep(DELAY)
+	}
+	if errValidate != nil {
+		h.logger.Error("Failed to validate callback", "error", errValidate)
+		return res.Unauthorized(pctx, errValidate)
+	}
 
-	// token, err := googleOAuth2Config.Exchange(ctx, pctx.QueryParam("code"))
-	// if err != nil {
-	// 	h.logger.Error("Failed to exchange token: %s", err.Error())
-	// 	return res.Unauthorized(pctx, err)
-	// }
+	token, err := googleOAuth2Config.Exchange(ctx, pctx.QueryParam("code"))
+	if err != nil {
+		h.logger.Error("Failed to exchange token", "error", err)
+		return res.Unauthorized(pctx, err)
+	}
 
-	// client := googleOAuth2Config.Client(ctx, token)
+	client := googleOAuth2Config.Client(ctx, token)
 
-	// userInfo, err := h.getUserInfo(client)
-	// if err != nil {
-	// 	h.logger.Error("Failed to get user info: %s", err.Error())
-	// 	return res.Unauthorized(pctx, err)
-	// }
+	userInfo, err := h.getUserInfo(client)
+	if err != nil {
+		h.logger.Error("Failed to get user info", "error", err)
+		return res.Unauthorized(pctx, err)
+	}
+	h.logger.Info("User info", "user", userInfo)
 
-	// userReq := new(UserCredential)
-	// copier.Copy(userReq, &userInfo)
-	// playerReq.Avatar = userInfo.Picture
-	// if err := pctx.oauth2Service.PlayerAccountCreate(playerReq); err != nil {
-	// 	pctx.logger.Errorf("Failed to get user info: %s", err.Error())
-	// 	return custom.Error(pctx, http.StatusUnauthorized, err.Error())
-	// }
+	userReq := userInfo.ToUserLoginRequest()
+	if err := h.authGoogleUsecase.UserLogin(userReq); err != nil {
+		h.logger.Error("Failed to login user", "error", err)
+		return res.Unauthorized(pctx, err)
+	}
 
-	// pctx.setSameSiteCookie(pctx, accessTokenCookieName, token.AccessToken)
-	// pctx.setSameSiteCookie(pctx, refreshTokenCookieName, token.RefreshToken)
+	h.setSameSiteCookie(pctx, accessTokenCookieName, token.AccessToken)
+	h.setSameSiteCookie(pctx, refreshTokenCookieName, token.RefreshToken)
 
-	// return pctx.JSON(http.StatusOK, &_oauth2Model.LoginResponse{Message: "Login success"})
+	return res.Success(pctx, "Logged in successfully", nil)
 }
 
 func (h *AuthGoogleHandlerImpl) Logout(pctx *echo.Context) error {
@@ -109,11 +123,13 @@ func randomState() string {
 }
 
 func (h *AuthGoogleHandlerImpl) setCookie(pctx *echo.Context, name, value string) {
+	isProduction := h.env.GO_ENV == "production"
 	cookie := http.Cookie{
 		Name:     name,
 		Value:    value,
 		Path:     "/",
 		HttpOnly: true,
+		Secure:   isProduction,
 	}
 	pctx.SetCookie(&cookie)
 }
@@ -126,4 +142,56 @@ func (h *AuthGoogleHandlerImpl) removeCookie(pctx *echo.Context, name string) {
 		MaxAge:   -1,
 	}
 	pctx.SetCookie(&cookie)
+}
+
+func (h *AuthGoogleHandlerImpl) setSameSiteCookie(pctx *echo.Context, name, value string) {
+	isProduction := h.env.GO_ENV == "production"
+	cookie := http.Cookie{
+		Name:     name,
+		Value:    value,
+		Path:     "/",
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+		Secure:   isProduction,
+	}
+	pctx.SetCookie(&cookie)
+}
+
+func (h *AuthGoogleHandlerImpl) callbackValidating(pctx *echo.Context) error {
+	state := pctx.QueryParam("state")
+
+	stateFromCookie, err := pctx.Request().Cookie(stateCookieName)
+	if err != nil {
+		h.logger.Error("State cookie not found", "error", err)
+		return errors.New("Error: State cookie not found")
+	}
+
+	if state == "" || state != stateFromCookie.Value {
+		h.logger.Error("Error: State mismatch")
+		return errors.New("Error: State mismatch")
+	}
+
+	h.removeCookie(pctx, stateCookieName)
+
+	return nil
+}
+
+func (h *AuthGoogleHandlerImpl) getUserInfo(client *http.Client) (*UserCredential, error) {
+	resp, err := client.Get(h.env.GOOGLE_USER_INFO_URL)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	userInfoBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	userInfo := new(UserCredential)
+	if err := json.Unmarshal(userInfoBytes, userInfo); err != nil {
+		return nil, err
+	}
+
+	return userInfo, nil
 }

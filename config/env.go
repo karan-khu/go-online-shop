@@ -25,6 +25,7 @@ type Env struct {
 	GOOGLE_CLIENT_SECRET string
 	GOOGLE_REDIRECT_URL  string
 	GOOGLE_SCOPES        string
+	GOOGLE_USER_INFO_URL string
 }
 
 func NewEnv() *Env {
@@ -53,6 +54,7 @@ func NewEnv() *Env {
 		GOOGLE_CLIENT_SECRET: getEnv("GOOGLE_CLIENT_SECRET", "", true),
 		GOOGLE_REDIRECT_URL:  getEnv("GOOGLE_REDIRECT_URL", "", true),
 		GOOGLE_SCOPES:        getEnv("GOOGLE_SCOPES", "", true),
+		GOOGLE_USER_INFO_URL: getEnv("GOOGLE_USER_INFO_URL", "", true),
 	}
 }
 

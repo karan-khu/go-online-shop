@@ -11,5 +11,10 @@ type AuthGoogleHandler interface {
 }
 
 type AuthGoogleUsecase interface {
-	UserLogin(credential *UserCredential) error
+	UserLogin(userReq *UserLoginRequest) error
+}
+
+type UserCreator interface {
+	CreateUser(req *UserLoginRequest) error
+	UserExists(userID string) bool
 }
