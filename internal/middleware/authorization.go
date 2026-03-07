@@ -75,7 +75,6 @@ func (m *AuthorizationMiddlewareImpl) Authorizing(next echo.HandlerFunc) echo.Ha
 
 func (m *AuthorizationMiddlewareImpl) tokenRefreshing(pctx *echo.Context, token *oauth2.Token) (*oauth2.Token, error) {
 	ctx := context.Background()
-
 	updateToken, err := m.oauth2.GoogleOAuth2Config.TokenSource(ctx, token).Token()
 	if err != nil {
 		return nil, err
@@ -86,14 +85,12 @@ func (m *AuthorizationMiddlewareImpl) tokenRefreshing(pctx *echo.Context, token 
 		Value:    updateToken.AccessToken,
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
 	})
 	pctx.SetCookie(&http.Cookie{
 		Name:     m.oauth2.RefreshTokenKey,
 		Value:    updateToken.RefreshToken,
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteNoneMode,
 	})
 	return updateToken, nil
 }

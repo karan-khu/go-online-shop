@@ -12,12 +12,12 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v5"
-	"github.com/labstack/echo/v5/middleware"
 
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/internal/adapter"
 	"github.com/karan-khu/go-online-shop/internal/app/auth"
 	"github.com/karan-khu/go-online-shop/internal/app/balance"
+	"github.com/karan-khu/go-online-shop/internal/app/inventory"
 	"github.com/karan-khu/go-online-shop/internal/app/item"
 	"github.com/karan-khu/go-online-shop/internal/app/user"
 	md "github.com/karan-khu/go-online-shop/internal/middleware"
@@ -38,7 +38,6 @@ func main() {
 	}))
 	app.Validator = validator.NewValidator()
 
-	app.Use(middleware.Recover())
 	app.Use(md.RequestLogger(conf.Env))
 	app.Use(md.CorsMiddleware(conf.Env))
 
@@ -62,6 +61,7 @@ func main() {
 	auth.RegisterRoutes(app, conf, authUsecase)
 	item.RegisterRoutes(app, conf, authMiddleware)
 	balance.RegisterBalanceRoutes(app, conf, authMiddleware)
+	inventory.RegisterRoutes(app, conf, authMiddleware)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

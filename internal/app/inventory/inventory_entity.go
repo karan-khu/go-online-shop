@@ -13,3 +13,10 @@ type InventoryEntity struct {
 func (InventoryEntity) TableName() string {
 	return "GOST_Inventories"
 }
+
+type QueryInventoryItemEntity struct {
+	InventoryEntity
+	ItemName        string `gorm:"column:Name"`
+	ItemDescription string `gorm:"column:Description"`
+	ItemPicture     string `gorm:"column:Picture"`
+}
