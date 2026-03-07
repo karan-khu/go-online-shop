@@ -20,7 +20,7 @@ import (
 	"github.com/karan-khu/go-online-shop/internal/app/inventory"
 	"github.com/karan-khu/go-online-shop/internal/app/item"
 	"github.com/karan-khu/go-online-shop/internal/app/user"
-	md "github.com/karan-khu/go-online-shop/internal/middleware"
+	appMiddleware "github.com/karan-khu/go-online-shop/internal/middleware"
 	"github.com/karan-khu/go-online-shop/pkg/upload"
 	"github.com/karan-khu/go-online-shop/pkg/validator"
 )
@@ -38,8 +38,10 @@ func main() {
 	}))
 	app.Validator = validator.NewValidator()
 
-	app.Use(md.RequestLogger(conf.Env))
-	app.Use(md.CorsMiddleware(conf.Env))
+	app.Use(appMiddleware.RequestLogger(conf.Env))
+	app.Use(appMiddleware.CorsMiddleware(conf.Env))
+	app.Use(appMiddleware.RateLimit(100))
+	app.Use(appMiddleware.RequestTimeout(10 * time.Second))
 
 	app.Static("/uploads", "./uploads")
 	app.POST("/api/v1/upload/image", func(c *echo.Context) error {
@@ -56,12 +58,12 @@ func main() {
 	userRepo := user.NewUserRepository(app.Logger, conf)
 	userCreator := adapter.NewAuthUserAdapter(userRepo)
 	authUsecase := auth.NewAuthGoogleUsecase(userCreator)
-	authMiddleware := md.NewAuthorizationMiddleware(app.Logger, conf, authUsecase)
+	authorizing := appMiddleware.NewAuthorizationMiddleware(app.Logger, conf, authUsecase)
 
 	auth.RegisterRoutes(app, conf, authUsecase)
-	item.RegisterRoutes(app, conf, authMiddleware)
-	balance.RegisterBalanceRoutes(app, conf, authMiddleware)
-	inventory.RegisterRoutes(app, conf, authMiddleware)
+	item.RegisterRoutes(app, conf, authorizing)
+	balance.RegisterBalanceRoutes(app, conf, authorizing)
+	inventory.RegisterRoutes(app, conf, authorizing)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
