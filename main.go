@@ -17,6 +17,7 @@ import (
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/internal/adapter"
 	"github.com/karan-khu/go-online-shop/internal/app/auth"
+	"github.com/karan-khu/go-online-shop/internal/app/balance"
 	"github.com/karan-khu/go-online-shop/internal/app/item"
 	"github.com/karan-khu/go-online-shop/internal/app/user"
 	md "github.com/karan-khu/go-online-shop/internal/middleware"
@@ -60,6 +61,7 @@ func main() {
 
 	auth.RegisterRoutes(app, conf, authUsecase)
 	item.RegisterRoutes(app, conf, authMiddleware)
+	balance.RegisterBalanceRoutes(app, conf, authMiddleware)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()

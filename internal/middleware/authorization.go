@@ -66,7 +66,7 @@ func (m *AuthorizationMiddlewareImpl) Authorizing(next echo.HandlerFunc) echo.Ha
 			return res.Unauthorized(pctx, errors.New("User does not exist"))
 		}
 
-		pctx.Set("userID", userInfo.ID)
+		pctx.Set("userId", userInfo.ID)
 		pctx.Set("userEmail", userInfo.Email)
 
 		return next(pctx)
