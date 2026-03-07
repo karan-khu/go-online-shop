@@ -18,15 +18,20 @@ request:
   auth:
     type: oauth2
     flow: authorization_code
-    authorizationUrl: https://accounts.google.com/o/oauth2/auth?access_type=offline&prompt=consent
-    accessTokenUrl: https://oauth2.googleapis.com/token
+    authorizationUrl: "{{process.env.GOOGLE_AUTH_URL}}"
+    accessTokenUrl: "{{process.env.GOOGLE_TOKEN_URL}}"
     callbackUrl: https://oauth.usebruno.com/callback
     credentials:
-      # Replace with your Google OAuth credentials or use Bruno env variables
-      clientId: "{{GOOGLE_CLIENT_ID}}"
-      clientSecret: "{{GOOGLE_CLIENT_SECRET}}"
+      clientId: "{{process.env.GOOGLE_CLIENT_ID}}"
+      clientSecret: "{{process.env.GOOGLE_CLIENT_SECRET}}"
       placement: body
-    scope: openid https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile
+    scope: "{{process.env.GOOGLE_SCOPES}}"
+    pkce:
+      disabled: true
+    tokenConfig:
+      id: credentials
+      placement:
+        header: Bearer
     settings:
       autoFetchToken: true
       autoRefreshToken: false
@@ -36,8 +41,8 @@ request:
   scripts:
     - type: before-request
       code: |-
-        const accessToken = bru.getOauth2CredentialVar("$oauth2.credentials.access_token")
-        const refreshToken = bru.getOauth2CredentialVar("$oauth2.credentials.refresh_token")
+        const accessToken = bru.getOauth2CredentialVar("$oauth2.credentials.access_token"); 
+        const refreshToken = bru.getOauth2CredentialVar("$oauth2.credentials.refresh_token"); 
 
         const baseUrl = bru.getEnvVar("BASE_URL");
 
@@ -52,6 +57,7 @@ extensions:
     ignore:
       - node_modules
       - .git
+      - .env
     presets:
       request:
         type: http

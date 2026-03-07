@@ -1,4 +1,4 @@
 name: production
 variables:
   - name: BASE_URL
-    value: http://go-online-shop.karm.net
+    value: "{{process.env.BASE_URL_PROD}}"
