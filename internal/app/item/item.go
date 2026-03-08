@@ -3,19 +3,16 @@ package item
 import (
 	"github.com/labstack/echo/v5"
 
-	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/internal/middleware"
 )
 
-func RegisterRoutes(app *echo.Echo, conf *config.Config, authMiddleware middleware.AuthorizationMiddleware) {
+func RegisterRoutes(app *echo.Echo, httpHandler ItemHttpHandler, authMiddleware middleware.AuthorizationMiddleware) {
 	router := app.Group("/api/v1/items")
 
-	itemRepo := NewItemRepository(app.Logger, conf)
-	itemUsecase := NewItemUsecase(app.Logger, itemRepo, conf)
-	itemHttpHandler := NewItemHttpHandler(itemUsecase)
-
-	router.GET("", itemHttpHandler.GetAll, authMiddleware.Authorizing)
-	router.POST("/create", itemHttpHandler.Create)
-	router.PUT("/edit", itemHttpHandler.Edit)
-	router.DELETE("/delete/:item_id", itemHttpHandler.Delete)
+	router.GET("", httpHandler.GetAll, authMiddleware.Authorizing)
+	router.POST("/create", httpHandler.Create, authMiddleware.Authorizing)
+	router.PUT("/edit", httpHandler.Edit, authMiddleware.Authorizing)
+	router.DELETE("/delete/:item_id", httpHandler.Delete, authMiddleware.Authorizing)
+	router.POST("/buy", httpHandler.Buying, authMiddleware.Authorizing)
+	router.POST("/sell", httpHandler.Selling, authMiddleware.Authorizing)
 }

@@ -17,12 +17,3 @@ type UserCredential struct {
 	Picture       string `json:"picture"`
 	Locale        string `json:"locale"`
 }
-
-func (u *UserCredential) ToUserLoginRequest() *UserLoginRequest {
-	return &UserLoginRequest{
-		ID:       u.ID,
-		Email:    u.Email,
-		FullName: u.Name,
-		Picture:  u.Picture,
-	}
-}

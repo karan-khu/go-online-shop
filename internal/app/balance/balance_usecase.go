@@ -17,7 +17,7 @@ func (u *BalanceUsecaseImpl) CoinAdding(req *CoinTopUpRequest) (*UserBalanceEnti
 		Status: "TOPUP",
 	}
 
-	newBalance, err := u.balanceRepo.CoinAdd(balance)
+	newBalance, err := u.balanceRepo.CoinAdd(nil, balance)
 	if err != nil {
 		return nil, err
 	}

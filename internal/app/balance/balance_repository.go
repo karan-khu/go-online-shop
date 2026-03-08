@@ -3,6 +3,8 @@ package balance
 import (
 	"log/slog"
 
+	"gorm.io/gorm"
+
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/pkg/database"
 )
@@ -19,9 +21,14 @@ func NewBalanceRepository(logger *slog.Logger, conf *config.Config) BalanceRepos
 	}
 }
 
-func (r *BalanceRepositoryImpl) CoinAdd(req *UserBalanceEntity) (*UserBalanceEntity, error) {
+func (r *BalanceRepositoryImpl) CoinAdd(tx *gorm.DB, req *UserBalanceEntity) (*UserBalanceEntity, error) {
+	conn := r.db.Connect()
+	if tx != nil {
+		conn = tx
+	}
+
 	newBalance := new(UserBalanceEntity)
-	if err := r.db.Connect().Create(req).Scan(newBalance).Error; err != nil {
+	if err := conn.Create(req).Scan(newBalance).Error; err != nil {
 		r.logger.Error("failed to create balance", "error", err)
 		return nil, err
 	}

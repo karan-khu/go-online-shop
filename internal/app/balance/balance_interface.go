@@ -1,6 +1,9 @@
 package balance
 
-import "github.com/labstack/echo/v5"
+import (
+	"github.com/labstack/echo/v5"
+	"gorm.io/gorm"
+)
 
 type BalanceHttpHandler interface {
 	CoinTopUp(pctx *echo.Context) error
@@ -13,6 +16,6 @@ type BalanceUsecase interface {
 }
 
 type BalanceRepository interface {
-	CoinAdd(req *UserBalanceEntity) (*UserBalanceEntity, error)
+	CoinAdd(tx *gorm.DB, req *UserBalanceEntity) (*UserBalanceEntity, error)
 	CoinShow(userId string) (*UserCoinDisplay, error)
 }

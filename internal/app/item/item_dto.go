@@ -74,3 +74,15 @@ type ResponseItemDetail struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 	ItemModel
 }
+
+type RequestItemBuying struct {
+	UserId   string
+	ItemId   int `json:"item_id" validate:"required"`
+	Quantity int `json:"quantity" validate:"required,min=1"`
+}
+
+type RequestItemSelling struct {
+	UserId   string
+	ItemId   int `json:"item_id" validate:"required"`
+	Quantity int `json:"quantity" validate:"required,min=1"`
+}

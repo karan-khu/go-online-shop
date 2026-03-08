@@ -43,8 +43,7 @@ func (h *itemHttpHandlerImpl) Create(pctx *echo.Context) error {
 	if err := pctx.Bind(req); err != nil {
 		pctx.Logger().Error("failed to bind request", "error", err)
 		return res.BadRequest(pctx, err)
-	}
-	if err := pctx.Validate(req); err != nil {
+	} else if err := pctx.Validate(req); err != nil {
 		return res.BadRequest(pctx, err)
 	}
 
@@ -62,8 +61,7 @@ func (h *itemHttpHandlerImpl) Edit(pctx *echo.Context) error {
 	if err := pctx.Bind(req); err != nil {
 		pctx.Logger().Error("failed to bind request", "error", err)
 		return res.BadRequest(pctx, err)
-	}
-	if err := pctx.Validate(req); err != nil {
+	} else if err := pctx.Validate(req); err != nil {
 		return res.BadRequest(pctx, err)
 	}
 
@@ -92,4 +90,48 @@ func (h *itemHttpHandlerImpl) Delete(pctx *echo.Context) error {
 	}
 
 	return res.Success(pctx, "Item deleted successfully", nil)
+}
+
+func (h *itemHttpHandlerImpl) Buying(pctx *echo.Context) error {
+	userId := pctx.Get("userId").(string)
+	if userId == "" {
+		return res.Unauthorized(pctx, errors.New("Unauthorized"))
+	}
+
+	req := new(RequestItemBuying)
+	if err := pctx.Bind(req); err != nil {
+		pctx.Logger().Error("failed to bind request", "error", err)
+		return res.BadRequest(pctx, err)
+	} else if err := pctx.Validate(req); err != nil {
+		return res.BadRequest(pctx, err)
+	}
+
+	req.UserId = userId
+	if err := h.itemUsecase.Buying(req); err != nil {
+		return res.BadRequest(pctx, err)
+	}
+
+	return res.Success(pctx, "Buying item successfully", nil)
+}
+
+func (h *itemHttpHandlerImpl) Selling(pctx *echo.Context) error {
+	userId := pctx.Get("userId").(string)
+	if userId == "" {
+		return res.Unauthorized(pctx, errors.New("Unauthorized"))
+	}
+
+	req := new(RequestItemSelling)
+	if err := pctx.Bind(req); err != nil {
+		pctx.Logger().Error("failed to bind request", "error", err)
+		return res.BadRequest(pctx, err)
+	} else if err := pctx.Validate(req); err != nil {
+		return res.BadRequest(pctx, err)
+	}
+
+	req.UserId = userId
+	if err := h.itemUsecase.Selling(req); err != nil {
+		return res.BadRequest(pctx, err)
+	}
+
+	return res.Success(pctx, "Selling item successfully", nil)
 }

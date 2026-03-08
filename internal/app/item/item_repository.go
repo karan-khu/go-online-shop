@@ -1,7 +1,10 @@
 package item
 
 import (
+	"errors"
 	"log/slog"
+
+	"gorm.io/gorm"
 
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/pkg/database"
@@ -42,6 +45,15 @@ func (r *itemRepositoryImpl) Listing(req *RequestItemFilter) ([]*ItemEntity, int
 	return list, int(totalCount), nil
 }
 
+func (r *itemRepositoryImpl) FindById(itemId int) (*ItemEntity, error) {
+	item := new(ItemEntity)
+	if err := r.db.Connect().Where("ItemId = ?", itemId).First(item).Error; err != nil {
+		r.logger.Error("failed to find item by id", "error", err)
+		return nil, errors.New("item not found")
+	}
+	return item, nil
+}
+
 func (r *itemRepositoryImpl) FindExists(itemId int) bool {
 	var count int64
 	if err := r.db.Connect().Model(&ItemEntity{}).Where("ItemId = ?", itemId).Count(&count).Error; err != nil {
@@ -78,4 +90,16 @@ func (r *itemRepositoryImpl) Archive(itemId int) error {
 		return err
 	}
 	return nil
+}
+
+func (r *itemRepositoryImpl) Begin() *gorm.DB {
+	return r.db.Begin()
+}
+
+func (r *itemRepositoryImpl) Commit(tx *gorm.DB) error {
+	return r.db.Commit(tx)
+}
+
+func (r *itemRepositoryImpl) Rollback(tx *gorm.DB) error {
+	return r.db.Rollback(tx)
 }

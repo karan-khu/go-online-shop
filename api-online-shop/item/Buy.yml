@@ -1,16 +1,17 @@
 info:
-  name: Top up
+  name: Buy
   type: http
-  seq: 2
+  seq: 5
 
 http:
   method: POST
-  url: "{{BASE_URL}}/api/v1/balance/topup"
+  url: "{{BASE_URL}}/api/v1/items/buy"
   body:
     type: json
     data: |-
       {
-        "amount": 5500
+        "item_id": 4,
+        "quantity": 4
       }
   auth: inherit
 

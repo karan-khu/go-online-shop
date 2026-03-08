@@ -1,23 +1,18 @@
 package inventory
 
-import "log/slog"
-
 type inventoryUsecaseImpl struct {
 	inventoryRepo InventoryRepository
-	logger        *slog.Logger
 }
 
-func NewInventoryUsecase(logger *slog.Logger, inventoryRepo InventoryRepository) InventoryUsecase {
+func NewInventoryUsecase(inventoryRepo InventoryRepository) InventoryUsecase {
 	return &inventoryUsecaseImpl{
 		inventoryRepo: inventoryRepo,
-		logger:        logger,
 	}
 }
 
 func (u *inventoryUsecaseImpl) Listing(userId string) ([]*InventoryListing, error) {
 	inventoryList, err := u.inventoryRepo.Listing(userId)
 	if err != nil {
-		u.logger.Error("failed to get inventory list", "error", err)
 		return nil, err
 	}
 

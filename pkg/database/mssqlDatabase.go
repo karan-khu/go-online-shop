@@ -38,3 +38,15 @@ func NewSqlServerDatabase(host, user, pass, db string) Database {
 func (d *sqlServerDatabase) Connect() *gorm.DB {
 	return instance.DB
 }
+
+func (d *sqlServerDatabase) Begin() *gorm.DB {
+	return d.DB.Begin()
+}
+
+func (d *sqlServerDatabase) Commit(tx *gorm.DB) error {
+	return tx.Commit().Error
+}
+
+func (d *sqlServerDatabase) Rollback(tx *gorm.DB) error {
+	return tx.Rollback().Error
+}

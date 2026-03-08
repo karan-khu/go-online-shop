@@ -81,7 +81,11 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 	}
 	h.logger.Info("User info", "user", userInfo)
 
-	userReq := userInfo.ToUserLoginRequest()
+	userReq := &UserLoginRequest{
+		Email:    userInfo.Email,
+		FullName: userInfo.Name,
+		Picture:  userInfo.Picture,
+	}
 	if err := h.authGoogleUsecase.UserLogin(userReq); err != nil {
 		h.logger.Error("Failed to login user", "error", err)
 		return res.Unauthorized(pctx, err)
