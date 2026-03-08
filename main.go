@@ -18,6 +18,7 @@ import (
 	"github.com/karan-khu/go-online-shop/internal/app/balance"
 	"github.com/karan-khu/go-online-shop/internal/app/inventory"
 	"github.com/karan-khu/go-online-shop/internal/app/item"
+	"github.com/karan-khu/go-online-shop/internal/app/purchase"
 	"github.com/karan-khu/go-online-shop/internal/app/user"
 	"github.com/karan-khu/go-online-shop/internal/middleware"
 	"github.com/karan-khu/go-online-shop/pkg/upload"
@@ -83,12 +84,16 @@ func main() {
 	itemRepo := item.NewItemRepository(server.Logger, server.conf)
 	itemUsecase := item.NewItemUsecase(server.Logger, itemRepo, balanceRepo, inventoryRepo, server.imageBuilder)
 	itemHttpHandler := item.NewItemHttpHandler(itemUsecase)
+	purchaseRepo := purchase.NewPurchaseRepository(server.Logger, server.conf)
+	purchaseUsecase := purchase.NewPurchaseUsecase(purchaseRepo)
+	purchaseHttpHandler := purchase.NewPurchaseHttpHandler(server.Logger, purchaseUsecase)
 
 	// Router registering
 	auth.RegisterRoutes(server.Echo, authGoogleHandler)
 	balance.RegisterBalanceRoutes(server.Echo, balanceHttpHandler, authMiddleware)
 	inventory.RegisterRoutes(server.Echo, inventoryHttpHandler, authMiddleware)
 	item.RegisterRoutes(server.Echo, itemHttpHandler, authMiddleware)
+	purchase.RegisterRoutes(server.Echo, purchaseHttpHandler, authMiddleware)
 
 	// Start server
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
