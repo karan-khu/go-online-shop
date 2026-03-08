@@ -1,6 +1,9 @@
 package purchase
 
-import "github.com/labstack/echo/v5"
+import (
+	"github.com/labstack/echo/v5"
+	"gorm.io/gorm"
+)
 
 type PurchaseHttpHandler interface {
 	Listing(c *echo.Context) error
@@ -12,5 +15,5 @@ type PurchaseUsecase interface {
 
 type PurchaseRepository interface {
 	Listing(userId string) ([]*PurchaseHistoryEntity, error)
-	Create(purchase *PurchaseHistoryEntity) (*PurchaseHistoryEntity, error)
+	Create(tx *gorm.DB, purchase *PurchaseHistoryEntity) (*PurchaseHistoryEntity, error)
 }

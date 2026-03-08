@@ -82,10 +82,10 @@ func main() {
 	inventoryUsecase := inventory.NewInventoryUsecase(inventoryRepo)
 	inventoryHttpHandler := inventory.NewInventoryHttpHandler(server.Logger, inventoryUsecase)
 	itemRepo := item.NewItemRepository(server.Logger, server.conf)
-	itemUsecase := item.NewItemUsecase(server.Logger, itemRepo, balanceRepo, inventoryRepo, server.imageBuilder)
-	itemHttpHandler := item.NewItemHttpHandler(itemUsecase)
 	purchaseRepo := purchase.NewPurchaseRepository(server.Logger, server.conf)
 	purchaseUsecase := purchase.NewPurchaseUsecase(purchaseRepo)
+	itemUsecase := item.NewItemUsecase(server.Logger, itemRepo, balanceRepo, inventoryRepo, purchaseRepo, server.imageBuilder)
+	itemHttpHandler := item.NewItemHttpHandler(itemUsecase)
 	purchaseHttpHandler := purchase.NewPurchaseHttpHandler(server.Logger, purchaseUsecase)
 
 	// Router registering

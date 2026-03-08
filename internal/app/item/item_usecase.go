@@ -7,6 +7,7 @@ import (
 
 	"github.com/karan-khu/go-online-shop/internal/app/balance"
 	"github.com/karan-khu/go-online-shop/internal/app/inventory"
+	"github.com/karan-khu/go-online-shop/internal/app/purchase"
 	"github.com/karan-khu/go-online-shop/pkg/upload"
 )
 
@@ -15,15 +16,17 @@ type itemUsecaseImpl struct {
 	itemRepo      ItemRepository
 	balanceRepo   balance.BalanceRepository
 	inventoryRepo inventory.InventoryRepository
+	purchaseRepo  purchase.PurchaseRepository
 	imageBuilder  upload.ImageBuilder
 }
 
-func NewItemUsecase(logger *slog.Logger, itemRepo ItemRepository, balanceRepo balance.BalanceRepository, inventoryRepo inventory.InventoryRepository, imageBuilder upload.ImageBuilder) ItemUsecase {
+func NewItemUsecase(logger *slog.Logger, itemRepo ItemRepository, balanceRepo balance.BalanceRepository, inventoryRepo inventory.InventoryRepository, purchaseRepo purchase.PurchaseRepository, imageBuilder upload.ImageBuilder) ItemUsecase {
 	return &itemUsecaseImpl{
 		logger:        logger,
 		itemRepo:      itemRepo,
 		balanceRepo:   balanceRepo,
 		inventoryRepo: inventoryRepo,
+		purchaseRepo:  purchaseRepo,
 		imageBuilder:  imageBuilder,
 	}
 }
@@ -109,17 +112,15 @@ func (u *itemUsecaseImpl) DeleteItem(itemId int) error {
 // 6. Adding purchase record
 // 7. Returning item entity
 func (u *itemUsecaseImpl) Buying(req *RequestItemBuying) error {
-	targetItem, err := u.itemRepo.FindById(req.ItemId)
-	if err != nil {
-		u.logger.Error("failed to find item by id", "error", err)
-		return err
+	targetItem, itemErr := u.itemRepo.FindById(req.ItemId)
+	if itemErr != nil {
+		u.logger.Error("failed to find item by id", "error", itemErr)
+		return itemErr
 	}
 
 	totalPrice := targetItem.Price * req.Quantity
 
 	userBalance, err := u.balanceRepo.CoinShow(req.UserId)
-	u.logger.Info("user balance", "userBalance", userBalance)
-	u.logger.Info("total price", "totalPrice", totalPrice)
 	if err != nil {
 		u.logger.Error("failed to show user balance", "error", err)
 		return err
@@ -141,6 +142,20 @@ func (u *itemUsecaseImpl) Buying(req *RequestItemBuying) error {
 	}
 
 	if _, err := u.inventoryRepo.Filling(tx, req.UserId, targetItem.ItemId, req.Quantity); err != nil {
+		u.itemRepo.Rollback(tx)
+		return err
+	}
+
+	newPurchase := &purchase.PurchaseHistoryEntity{
+		BuyerId:         req.UserId,
+		ItemId:          targetItem.ItemId,
+		ItemName:        targetItem.Name,
+		ItemDescription: targetItem.Description,
+		ItemPrice:       targetItem.Price,
+		Quantity:        req.Quantity,
+		Type:            "BUY",
+	}
+	if _, err := u.purchaseRepo.Create(tx, newPurchase); err != nil {
 		u.itemRepo.Rollback(tx)
 		return err
 	}
@@ -189,6 +204,20 @@ func (u *itemUsecaseImpl) Selling(req *RequestItemSelling) error {
 	}
 
 	if err := u.inventoryRepo.Removing(tx, req.UserId, targetItem.ItemId, req.Quantity); err != nil {
+		u.itemRepo.Rollback(tx)
+		return err
+	}
+
+	newPurchase := &purchase.PurchaseHistoryEntity{
+		BuyerId:         req.UserId,
+		ItemId:          targetItem.ItemId,
+		ItemName:        targetItem.Name,
+		ItemDescription: targetItem.Description,
+		ItemPrice:       targetItem.Price,
+		Quantity:        req.Quantity,
+		Type:            "SELL",
+	}
+	if _, err := u.purchaseRepo.Create(tx, newPurchase); err != nil {
 		u.itemRepo.Rollback(tx)
 		return err
 	}

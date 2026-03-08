@@ -4,6 +4,8 @@ import (
 	"errors"
 	"log/slog"
 
+	"gorm.io/gorm"
+
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/pkg/database"
 )
@@ -30,9 +32,14 @@ func (r *purchaseRepositoryImpl) Listing(userId string) ([]*PurchaseHistoryEntit
 	return listPurchase, nil
 }
 
-func (r *purchaseRepositoryImpl) Create(purchase *PurchaseHistoryEntity) (*PurchaseHistoryEntity, error) {
+func (r *purchaseRepositoryImpl) Create(tx *gorm.DB, purchase *PurchaseHistoryEntity) (*PurchaseHistoryEntity, error) {
+	conn := r.db.Connect()
+	if tx != nil {
+		conn = tx
+	}
+
 	newPurchase := new(PurchaseHistoryEntity)
-	if err := r.db.Connect().Create(purchase).Scan(newPurchase).Error; err != nil {
+	if err := conn.Create(purchase).Scan(newPurchase).Error; err != nil {
 		r.logger.Error("failed to create purchase", "error", err)
 		return nil, errors.New("failed to create purchase")
 	}
