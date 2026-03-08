@@ -3,11 +3,11 @@ package user
 import "time"
 
 type UserEntity struct {
-	UserId       int       `gorm:"column:UserId;primaryKey;autoIncrement"`
-	Username     string    `gorm:"column:Username;size:255"`
+	UserId       string    `gorm:"column:UserId;primaryKey"`
 	FullName     string    `gorm:"column:FullName;size:255"`
 	Email        string    `gorm:"column:Email;size:255"`
-	Role         string    `gorm:"column:Role;size:10;comment:ADMIN/USER"`
+	Picture      string    `gorm:"column:Picture;size:255"`
+	Role         string    `gorm:"column:Role;size:10;comment:ADMIN/USER;default:USER"`
 	ActiveStatus string    `gorm:"column:ActiveStatus;size:20;default:AVAILABLE"`
 	CreatedAt    time.Time `gorm:"column:CreatedAt;autoCreateTime"`
 	UpdatedAt    time.Time `gorm:"column:UpdatedAt;autoUpdateTime"`

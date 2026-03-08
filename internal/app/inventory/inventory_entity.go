@@ -4,7 +4,7 @@ import "time"
 
 type InventoryEntity struct {
 	InventoryId  int       `gorm:"column:InventoryId;primaryKey;autoIncrement"`
-	UserId       int       `gorm:"column:UserId"`
+	UserId       string    `gorm:"column:UserId"`
 	ItemId       int       `gorm:"column:ItemId"`
 	ActiveStatus string    `gorm:"column:ActiveStatus;size:20;default:AVAILABLE"`
 	CreatedAt    time.Time `gorm:"column:CreatedAt;autoCreateTime"`
@@ -12,4 +12,11 @@ type InventoryEntity struct {
 
 func (InventoryEntity) TableName() string {
 	return "GOST_Inventories"
+}
+
+type QueryInventoryItemEntity struct {
+	InventoryEntity
+	ItemName        string `gorm:"column:Name"`
+	ItemDescription string `gorm:"column:Description"`
+	ItemPicture     string `gorm:"column:Picture"`
 }

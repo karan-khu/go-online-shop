@@ -20,7 +20,7 @@ func main() {
 
 	db := database.NewSqlServerDatabase(env.DB_HOST, env.DB_USERNAME, env.DB_PASSWORD, env.DB_NAME)
 
-	tx := db.Begin()
+	tx := db.Connect().Begin()
 
 	balanceMigration(tx)
 	inventoryMigration(tx)

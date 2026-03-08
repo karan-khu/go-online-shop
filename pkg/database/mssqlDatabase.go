@@ -18,7 +18,7 @@ var (
 	once     sync.Once
 )
 
-func NewSqlServerDatabase(host, user, pass, db string) sqlServerDatabase {
+func NewSqlServerDatabase(host, user, pass, db string) Database {
 	once.Do(func() {
 		connStr := fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s", host, user, pass, db)
 
@@ -32,5 +32,21 @@ func NewSqlServerDatabase(host, user, pass, db string) sqlServerDatabase {
 		instance = &sqlServerDatabase{conn}
 	})
 
-	return *instance
+	return instance
+}
+
+func (d *sqlServerDatabase) Connect() *gorm.DB {
+	return instance.DB
+}
+
+func (d *sqlServerDatabase) Begin() *gorm.DB {
+	return d.DB.Begin()
+}
+
+func (d *sqlServerDatabase) Commit(tx *gorm.DB) error {
+	return tx.Commit().Error
+}
+
+func (d *sqlServerDatabase) Rollback(tx *gorm.DB) error {
+	return tx.Rollback().Error
 }

@@ -15,15 +15,49 @@ config:
       bypassProxy: ""
 
 request:
+  auth:
+    type: oauth2
+    flow: authorization_code
+    authorizationUrl: "{{process.env.GOOGLE_AUTH_URL}}"
+    accessTokenUrl: "{{process.env.GOOGLE_TOKEN_URL}}"
+    callbackUrl: https://oauth.usebruno.com/callback
+    credentials:
+      clientId: "{{process.env.GOOGLE_CLIENT_ID}}"
+      clientSecret: "{{process.env.GOOGLE_CLIENT_SECRET}}"
+      placement: body
+    scope: "{{process.env.GOOGLE_SCOPES}}"
+    pkce:
+      disabled: true
+    tokenConfig:
+      id: credentials
+      placement:
+        header: Bearer
+    settings:
+      autoFetchToken: true
+      autoRefreshToken: false
   variables:
     - name: ""
       value: ""
+  scripts:
+    - type: before-request
+      code: |-
+        const accessToken = bru.getOauth2CredentialVar("$oauth2.credentials.access_token"); 
+        const refreshToken = bru.getOauth2CredentialVar("$oauth2.credentials.refresh_token"); 
+
+        const baseUrl = bru.getEnvVar("BASE_URL");
+
+        if (accessToken || refreshToken) {
+          const jar = bru.cookies.jar();
+          if (accessToken) jar.setCookie(baseUrl, "ACCESS_TOKEN", accessToken);
+          if (refreshToken) jar.setCookie(baseUrl, "REFRESH_TOKEN", refreshToken);
+        }
 bundled: false
 extensions:
   bruno:
     ignore:
       - node_modules
       - .git
+      - .env
     presets:
       request:
         type: http

@@ -1,0 +1,25 @@
+info:
+  name: GetAll
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{BASE_URL}}/api/v1/items?search_text&page=3&limit=3"
+  params:
+    - name: search_text
+      value: ""
+      type: query
+    - name: page
+      value: "3"
+      type: query
+    - name: limit
+      value: "3"
+      type: query
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

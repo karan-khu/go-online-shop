@@ -6,6 +6,13 @@ info:
 http:
   method: POST
   url: "{{BASE_URL}}/api/v1/upload/image"
+  body:
+    type: multipart-form
+    data:
+      - name: file
+        type: file
+        value:
+          - /Users/ka12m/Downloads/spell-tome.webp
   auth: inherit
 
 settings:

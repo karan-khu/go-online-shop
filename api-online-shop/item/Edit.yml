@@ -1,0 +1,25 @@
+info:
+  name: Edit
+  type: http
+  seq: 3
+
+http:
+  method: PUT
+  url: "{{BASE_URL}}/api/v1/items/edit"
+  body:
+    type: json
+    data: |-
+      {
+        "item_id": 9,
+        "name": "Spell Tome",
+        "description": "+40 พลังเวท",
+        "price": 220,
+        "picture": "http://localhost:8800/uploads/spell-tome.webp"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

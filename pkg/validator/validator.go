@@ -19,10 +19,3 @@ func (cv *customValidator) Validate(i any) error {
 	}
 	return nil
 }
-
-func ValidateSchema(c *echo.Context, schema any) error {
-	if err := c.Bind(schema); err != nil {
-		return err
-	}
-	return c.Validate(schema)
-}

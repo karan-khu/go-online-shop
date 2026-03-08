@@ -10,6 +10,7 @@ import (
 type Env struct {
 	GO_ENV      string
 	APP_PORT    string
+	APP_HOST    string
 	APP_NAME    string
 	APP_VERSION string
 	APP_CORS    string
@@ -19,6 +20,16 @@ type Env struct {
 	DB_USERNAME string
 	DB_PASSWORD string
 	DB_NAME     string
+
+	GOOGLE_CLIENT_ID        string
+	GOOGLE_CLIENT_SECRET    string
+	GOOGLE_REDIRECT_URL     string
+	GOOGLE_SCOPES           string
+	GOOGLE_AUTH_URL         string
+	GOOGLE_TOKEN_URL        string
+	GOOGLE_DEVICE_AUTH_URL  string
+	GOOGLE_USER_INFO_URL    string
+	GOOGLE_REVOKE_TOKEN_URL string
 }
 
 func NewEnv() *Env {
@@ -32,6 +43,7 @@ func NewEnv() *Env {
 	return &Env{
 		GO_ENV:      getEnv("GO_ENV", "development", false),
 		APP_PORT:    getEnv("APP_PORT", "8000", false),
+		APP_HOST:    getEnv("APP_HOST", "", true),
 		APP_NAME:    getEnv("APP_NAME", "app-online-shop", false),
 		APP_VERSION: getEnv("APP_VERSION", "1.0.0", false),
 		APP_CORS:    getEnv("APP_CORS", "", false),
@@ -41,6 +53,16 @@ func NewEnv() *Env {
 		DB_USERNAME: getEnv("DB_USERNAME", "", true),
 		DB_PASSWORD: getEnv("DB_PASSWORD", "", true),
 		DB_NAME:     getEnv("DB_NAME", "db-online-shop", false),
+
+		GOOGLE_CLIENT_ID:        getEnv("GOOGLE_CLIENT_ID", "", true),
+		GOOGLE_CLIENT_SECRET:    getEnv("GOOGLE_CLIENT_SECRET", "", true),
+		GOOGLE_REDIRECT_URL:     getEnv("GOOGLE_REDIRECT_URL", "", true),
+		GOOGLE_SCOPES:           getEnv("GOOGLE_SCOPES", "", true),
+		GOOGLE_AUTH_URL:         getEnv("GOOGLE_AUTH_URL", "", true),
+		GOOGLE_TOKEN_URL:        getEnv("GOOGLE_TOKEN_URL", "", true),
+		GOOGLE_DEVICE_AUTH_URL:  getEnv("GOOGLE_DEVICE_AUTH_URL", "", true),
+		GOOGLE_USER_INFO_URL:    getEnv("GOOGLE_USER_INFO_URL", "", true),
+		GOOGLE_REVOKE_TOKEN_URL: getEnv("GOOGLE_REVOKE_TOKEN_URL", "", true),
 	}
 }
 

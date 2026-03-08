@@ -4,7 +4,7 @@ import "time"
 
 type PurchaseHistoryEntity struct {
 	PurchaseId      int       `gorm:"column:PurchaseId;primaryKey;autoIncrement"`
-	BuyerId         int       `gorm:"column:BuyerId"`
+	BuyerId         string    `gorm:"column:BuyerId"`
 	ItemId          int       `gorm:"column:ItemId"`
 	ItemName        string    `gorm:"column:ItemName;size:255"`
 	ItemDescription string    `gorm:"column:ItemDescription;size:max"`
