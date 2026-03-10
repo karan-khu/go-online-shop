@@ -39,10 +39,17 @@ func NewAuthGoogleHandler(logger *slog.Logger, conf *config.Config, authGoogleUs
 
 func (h *AuthGoogleHandlerImpl) GoogleLogin(pctx *echo.Context) error {
 	state := randomState()
+	callbackUrl := pctx.QueryParam("callback_url")
 
 	pctx.SetCookie(&http.Cookie{
 		Name:     h.oauth2Config.StateCookieName,
 		Value:    state,
+		Path:     "/",
+		HttpOnly: true,
+	})
+	pctx.SetCookie(&http.Cookie{
+		Name:     h.oauth2Config.AppClientRedirectKey,
+		Value:    callbackUrl,
 		Path:     "/",
 		HttpOnly: true,
 	})
@@ -82,6 +89,7 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 	h.logger.Info("User info", "user", userInfo)
 
 	userReq := &UserLoginRequest{
+		ID:       userInfo.ID,
 		Email:    userInfo.Email,
 		FullName: userInfo.Name,
 		Picture:  userInfo.Picture,
@@ -103,6 +111,19 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 		Path:     "/",
 		HttpOnly: true,
 	})
+
+	callbackUrl, err := pctx.Request().Cookie(h.oauth2Config.AppClientRedirectKey)
+	if err != nil {
+		h.logger.Error("App client redirect cookie not found", "error", err)
+	} else if callbackUrl.Value != "" {
+		pctx.SetCookie(&http.Cookie{
+			Name:     h.oauth2Config.AppClientRedirectKey,
+			Path:     "/",
+			HttpOnly: true,
+			MaxAge:   -1,
+		})
+		return pctx.Redirect(http.StatusFound, callbackUrl.Value)
+	}
 	return res.Success(pctx, "Logged in successfully", userInfo)
 }
 
@@ -178,6 +199,7 @@ func (h *AuthGoogleHandlerImpl) getUserInfo(client *http.Client) (*UserCredentia
 	}
 
 	userInfo := new(UserCredential)
+	fmt.Println("userInfoBytes", string(userInfoBytes))
 	if err := json.Unmarshal(userInfoBytes, userInfo); err != nil {
 		return nil, err
 	}

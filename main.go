@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v5"
+	echoMiddleware "github.com/labstack/echo/v5/middleware"
 
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/internal/adapter"
@@ -60,6 +61,7 @@ func main() {
 	server := NewServer()
 
 	// Register middleware
+	server.Use(echoMiddleware.Recover())
 	server.Use(middleware.RequestLogger(server.conf.Env))
 	server.Use(middleware.CorsMiddleware(server.conf.Env))
 	server.Use(middleware.RateLimit(100))

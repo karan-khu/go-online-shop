@@ -13,10 +13,11 @@ var (
 )
 
 type Oauth2Config struct {
-	GoogleOAuth2Config *oauth2.Config
-	AccessTokenKey     string
-	RefreshTokenKey    string
-	StateCookieName    string
+	GoogleOAuth2Config   *oauth2.Config
+	AccessTokenKey       string
+	RefreshTokenKey      string
+	AppClientRedirectKey string
+	StateCookieName      string
 }
 
 func NewGoogleOAuth2Config(env *Env) *Oauth2Config {
@@ -35,9 +36,10 @@ func NewGoogleOAuth2Config(env *Env) *Oauth2Config {
 		}
 	})
 	return &Oauth2Config{
-		GoogleOAuth2Config: googleOAuth2Config,
-		AccessTokenKey:     "ACCESS_TOKEN",
-		RefreshTokenKey:    "REFRESH_TOKEN",
-		StateCookieName:    "STATE",
+		GoogleOAuth2Config:   googleOAuth2Config,
+		AccessTokenKey:       "ACCESS_TOKEN",
+		RefreshTokenKey:      "REFRESH_TOKEN",
+		AppClientRedirectKey: "APP_CLIENT_REDIRECT",
+		StateCookieName:      "STATE",
 	}
 }
