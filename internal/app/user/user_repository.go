@@ -6,6 +6,7 @@ import (
 
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/pkg/database"
+	"github.com/karan-khu/go-online-shop/pkg/database/models"
 )
 
 type UserRepositoryImpl struct {
@@ -20,22 +21,27 @@ func NewUserRepository(logger *slog.Logger, conf *config.Config) UserRepository 
 	}
 }
 
-func (r *UserRepositoryImpl) Creating(user *UserEntity) (*UserEntity, error) {
-	newUser := new(UserEntity)
-	if err := r.db.Connect().Create(user).Scan(newUser).Error; err != nil {
+func (r *UserRepositoryImpl) Creating(user *UserEntity) (result *UserEntity, err error) {
+	newUser := models.UserRecord{
+		UserId:   user.UserId,
+		FullName: user.FullName,
+		Email:    user.Email,
+		Picture:  user.Picture,
+		Role:     "USER",
+	}
+	if err = r.db.Connect().Create(&newUser).Scan(result).Error; err != nil {
 		r.logger.Error("failed to create user", "error", err)
 		return nil, errors.New("failed to create user")
 	}
 
-	return newUser, nil
+	return result, nil
 }
 
-func (r *UserRepositoryImpl) FindById(userId string) (*UserEntity, error) {
-	user := new(UserEntity)
-	if err := r.db.Connect().Where("UserId = ?", userId).First(user).Error; err != nil {
+func (r *UserRepositoryImpl) FindById(userId string) (result *UserEntity, err error) {
+	if err = r.db.Connect().Where("UserId = ?", userId).First(result).Error; err != nil {
 		r.logger.Error("failed to find user by id", "error", err)
 		return nil, errors.New("user not found")
 	}
 
-	return user, nil
+	return result, nil
 }
