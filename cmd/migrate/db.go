@@ -7,12 +7,8 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/karan-khu/go-online-shop/config"
-	"github.com/karan-khu/go-online-shop/internal/app/balance"
-	"github.com/karan-khu/go-online-shop/internal/app/inventory"
-	"github.com/karan-khu/go-online-shop/internal/app/item"
-	"github.com/karan-khu/go-online-shop/internal/app/purchase"
-	"github.com/karan-khu/go-online-shop/internal/app/user"
 	"github.com/karan-khu/go-online-shop/pkg/database"
+	"github.com/karan-khu/go-online-shop/pkg/database/models"
 )
 
 func main() {
@@ -39,21 +35,21 @@ func main() {
 }
 
 func balanceMigration(tx *gorm.DB) {
-	tx.AutoMigrate(&balance.UserBalanceEntity{})
+	tx.AutoMigrate(&models.UserBalanceRecord{})
 }
 
 func inventoryMigration(tx *gorm.DB) {
-	tx.AutoMigrate(&inventory.InventoryEntity{})
+	tx.AutoMigrate(&models.InventoryRecord{})
 }
 
 func itemMigration(tx *gorm.DB) {
-	tx.AutoMigrate(&item.ItemEntity{})
+	tx.AutoMigrate(&models.ItemRecord{})
 }
 
 func purchaseMigration(tx *gorm.DB) {
-	tx.AutoMigrate(&purchase.PurchaseHistoryEntity{})
+	tx.AutoMigrate(&models.PurchaseHistoryRecord{})
 }
 
 func userMigration(tx *gorm.DB) {
-	tx.AutoMigrate(&user.UserEntity{})
+	tx.AutoMigrate(&models.UserRecord{})
 }
