@@ -4,6 +4,8 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/jinzhu/copier"
+
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/pkg/database"
 	"github.com/karan-khu/go-online-shop/pkg/database/models"
@@ -22,26 +24,26 @@ func NewUserRepository(logger *slog.Logger, conf *config.Config) UserRepository 
 }
 
 func (r *UserRepositoryImpl) Creating(user *UserEntity) (result *UserEntity, err error) {
-	newUser := models.UserRecord{
-		UserId:   user.UserId,
-		FullName: user.FullName,
-		Email:    user.Email,
-		Picture:  user.Picture,
-		Role:     "USER",
-	}
-	if err = r.db.Connect().Create(&newUser).Scan(result).Error; err != nil {
+	newUser := new(models.UserRecord)
+	copier.Copy(newUser, user)
+
+	userRecord := new(models.UserRecord)
+	if err = r.db.Connect().Create(newUser).Scan(userRecord).Error; err != nil {
 		r.logger.Error("failed to create user", "error", err)
 		return nil, errors.New("failed to create user")
 	}
 
+	copier.Copy(result, userRecord)
 	return result, nil
 }
 
 func (r *UserRepositoryImpl) FindById(userId string) (result *UserEntity, err error) {
-	if err = r.db.Connect().Where("UserId = ?", userId).First(result).Error; err != nil {
+	userRecord := new(models.UserRecord)
+	if err = r.db.Connect().Where("UserId = ?", userId).First(userRecord).Error; err != nil {
 		r.logger.Error("failed to find user by id", "error", err)
 		return nil, errors.New("user not found")
 	}
 
+	copier.Copy(result, userRecord)
 	return result, nil
 }
