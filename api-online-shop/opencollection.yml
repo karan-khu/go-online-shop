@@ -34,7 +34,7 @@ request:
         header: Bearer
     settings:
       autoFetchToken: true
-      autoRefreshToken: false
+      autoRefreshToken: true
   variables:
     - name: ""
       value: ""

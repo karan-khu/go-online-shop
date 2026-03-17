@@ -22,7 +22,9 @@ func NewSqlServerDatabase(host, user, pass, db string) Database {
 	once.Do(func() {
 		connStr := fmt.Sprintf("server=%s;user id=%s;password=%s;database=%s", host, user, pass, db)
 
-		conn, err := gorm.Open(sqlserver.Open(connStr))
+		conn, err := gorm.Open(sqlserver.Open(connStr), &gorm.Config{
+			DisableForeignKeyConstraintWhenMigrating: true,
+		})
 		if err != nil {
 			log.Fatal(err)
 		}

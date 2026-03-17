@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"gorm.io/gorm"
-
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/pkg/database"
 	"github.com/karan-khu/go-online-shop/pkg/database/models"
@@ -18,11 +16,11 @@ func main() {
 
 	tx := db.Connect().Begin()
 
-	balanceMigration(tx)
-	inventoryMigration(tx)
-	itemMigration(tx)
-	purchaseMigration(tx)
-	userMigration(tx)
+	tx.AutoMigrate(&models.UserRecord{})
+	tx.AutoMigrate(&models.UserBalanceRecord{})
+	tx.AutoMigrate(&models.ItemRecord{})
+	tx.AutoMigrate(&models.InventoryRecord{})
+	tx.AutoMigrate(&models.PurchaseHistoryRecord{})
 
 	if err := tx.Commit().Error; err != nil {
 		if err := tx.Rollback().Error; err != nil {
@@ -32,24 +30,4 @@ func main() {
 	}
 
 	fmt.Println("Database migrated successfully")
-}
-
-func balanceMigration(tx *gorm.DB) {
-	tx.AutoMigrate(&models.UserBalanceRecord{})
-}
-
-func inventoryMigration(tx *gorm.DB) {
-	tx.AutoMigrate(&models.InventoryRecord{})
-}
-
-func itemMigration(tx *gorm.DB) {
-	tx.AutoMigrate(&models.ItemRecord{})
-}
-
-func purchaseMigration(tx *gorm.DB) {
-	tx.AutoMigrate(&models.PurchaseHistoryRecord{})
-}
-
-func userMigration(tx *gorm.DB) {
-	tx.AutoMigrate(&models.UserRecord{})
 }
