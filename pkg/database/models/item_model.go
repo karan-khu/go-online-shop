@@ -4,7 +4,7 @@ import "time"
 
 type ItemRecord struct {
 	ItemId       int       `gorm:"column:ItemId;primaryKey;autoIncrement"`
-	AdminId      string    `gorm:"column:AdminId;size:255"` // FK ไป UserRecord.UserId
+	AdminId      string    `gorm:"column:AdminId;size:255"`
 	Name         string    `gorm:"column:Name;size:255"`
 	Description  string    `gorm:"column:Description;size:max"`
 	Picture      string    `gorm:"column:Picture"`
@@ -13,7 +13,7 @@ type ItemRecord struct {
 	CreatedAt    time.Time `gorm:"column:CreatedAt;autoCreateTime"`
 	UpdatedAt    time.Time `gorm:"column:UpdatedAt;autoUpdateTime"`
 
-	Admin UserRecord `gorm:"foreignKey:AdminId;references:UserId;constraint:OnUpdate:NO ACTION,OnDelete:NO ACTION"`
+	Admin UserRecord `gorm:"foreignKey:AdminId;references:UserId"`
 }
 
 func (ItemRecord) TableName() string {
