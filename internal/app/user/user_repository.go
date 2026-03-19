@@ -33,6 +33,7 @@ func (r *UserRepositoryImpl) Creating(user *UserEntity) (result *UserEntity, err
 		return nil, errors.New("failed to create user")
 	}
 
+	result = new(UserEntity)
 	copier.Copy(result, userRecord)
 	return result, nil
 }
@@ -44,6 +45,7 @@ func (r *UserRepositoryImpl) FindById(userId string) (result *UserEntity, err er
 		return nil, errors.New("user not found")
 	}
 
+	result = new(UserEntity)
 	copier.Copy(result, userRecord)
 	return result, nil
 }

@@ -5,16 +5,11 @@ import (
 	"github.com/karan-khu/go-online-shop/internal/app/user"
 )
 
-type AuthUserAdapter interface {
-	CreateUser(req *auth.UserLoginRequest) error
-	UserExists(userID string) bool
-}
-
 type authUserAdapterImpl struct {
 	userRepo user.UserRepository
 }
 
-func NewAuthUserAdapter(userRepo user.UserRepository) AuthUserAdapter {
+func NewAuthUserAdapter(userRepo user.UserRepository) auth.UserCreatorAdapter {
 	return &authUserAdapterImpl{userRepo: userRepo}
 }
 

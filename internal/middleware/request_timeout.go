@@ -14,6 +14,6 @@ func RequestTimeout(timeOut time.Duration) echo.MiddlewareFunc {
 		ErrorHandler: func(c *echo.Context, err error) error {
 			return c.JSON(http.StatusRequestTimeout, map[string]string{"error": "Request Timeout."})
 		},
-		Timeout: timeOut * time.Second,
+		Timeout: timeOut,
 	})
 }

@@ -44,7 +44,8 @@ func (r *itemRepositoryImpl) Listing(limit int, page int, searchText string) (re
 		return nil, 0, err
 	}
 
-	copier.Copy(results, itemRecords)
+	results = make([]*ItemEntity, 0)
+	copier.Copy(&results, &itemRecords)
 	return results, total, nil
 }
 
@@ -55,13 +56,14 @@ func (r *itemRepositoryImpl) FindById(itemId int) (result *ItemEntity, err error
 		return nil, errors.New("item not found")
 	}
 
+	result = new(ItemEntity)
 	copier.Copy(result, itemRecord)
 	return result, nil
 }
 
 func (r *itemRepositoryImpl) FindExists(itemId int) bool {
 	var count int64
-	if err := r.db.Connect().Model(&ItemEntity{}).Where("ItemId = ?", itemId).Count(&count).Error; err != nil {
+	if err := r.db.Connect().Model(&models.ItemRecord{}).Where("ItemId = ?", itemId).Count(&count).Error; err != nil {
 		r.logger.Error("failed to find item exists", "error", err)
 		return false
 	}
@@ -70,6 +72,7 @@ func (r *itemRepositoryImpl) FindExists(itemId int) bool {
 
 func (r *itemRepositoryImpl) Create(item *ItemEntity) (result *ItemEntity, err error) {
 	newItem := new(models.ItemRecord)
+	copier.Copy(newItem, item)
 
 	itemRecord := new(models.ItemRecord)
 	if err := r.db.Connect().Create(newItem).Scan(itemRecord).Error; err != nil {
@@ -77,6 +80,7 @@ func (r *itemRepositoryImpl) Create(item *ItemEntity) (result *ItemEntity, err e
 		return nil, err
 	}
 
+	result = new(ItemEntity)
 	copier.Copy(result, itemRecord)
 	return result, nil
 }

@@ -31,7 +31,8 @@ func (r *purchaseRepositoryImpl) Listing(userId string) (results []*PurchaseHist
 		return nil, errors.New("failed to list purchase")
 	}
 
-	copier.Copy(results, purchaseRecords)
+	results = make([]*PurchaseHistoryEntity, 0)
+	copier.Copy(&results, &purchaseRecords)
 	return results, nil
 }
 
@@ -50,6 +51,7 @@ func (r *purchaseRepositoryImpl) Create(tx *gorm.DB, purchase *PurchaseHistoryEn
 		return nil, errors.New("failed to create purchase")
 	}
 
+	result = new(PurchaseHistoryEntity)
 	copier.Copy(result, purchaseRecord)
 	return result, nil
 }

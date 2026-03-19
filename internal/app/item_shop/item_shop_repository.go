@@ -42,7 +42,8 @@ func (r *itemShopRepositoryImpl) Listing(limit int, page int, searchText string)
 		return nil, 0, err
 	}
 
-	copier.Copy(results, itemRecords)
+	results = make([]*ItemShopEntity, 0)
+	copier.Copy(&results, &itemRecords)
 	return results, total, nil
 }
 
