@@ -24,7 +24,7 @@ func NewBalanceRepository(logger *slog.Logger, conf *config.Config) BalanceRepos
 	}
 }
 
-func (r *BalanceRepositoryImpl) CoinAdd(tx *gorm.DB, req *UserBalanceEntity) (result *UserBalanceEntity, err error) {
+func (r *BalanceRepositoryImpl) CoinAdd(tx *gorm.DB, req *UserBalanceEntity) (*UserBalanceEntity, error) {
 	conn := r.db.Connect()
 	if tx != nil {
 		conn = tx
@@ -38,18 +38,18 @@ func (r *BalanceRepositoryImpl) CoinAdd(tx *gorm.DB, req *UserBalanceEntity) (re
 		return nil, errors.New("failed to create balance")
 	}
 
-	result = new(UserBalanceEntity)
+	result := new(UserBalanceEntity)
 	copier.Copy(result, balanceRecord)
 	return result, nil
 }
 
-func (r *BalanceRepositoryImpl) CoinShow(userId string) (result *UserCoin, err error) {
-	result = new(UserCoin)
+func (r *BalanceRepositoryImpl) CoinShow(userId string) (*UserCoin, error) {
+	result := new(UserCoin)
 	if err := r.db.Connect().Model(&models.UserBalanceRecord{}).
-		Where("GOST_UserBalances.UserId = ?", userId).
-		Select("UserId, user.FullName, user.Email, SUM(Amount) AS Coin").
-		Joins("JOIN GOST_Users AS user ON user.UserId = GOST_UserBalances.UserId").
-		Group("GOST_UserBalances.UserId").
+		Select("u.UserId, u.FullName, u.Email, SUM(GOST_UserBalances.Amount) AS Coin").
+		Joins("RIGHT JOIN GOST_Users AS u ON u.UserId = GOST_UserBalances.UserId").
+		Where("u.UserId = ?", userId).
+		Group("u.UserId, u.FullName, u.Email").
 		Scan(result).Error; err != nil {
 		r.logger.Error("failed to show coin", "error", err)
 		return nil, errors.New("failed to get coin")

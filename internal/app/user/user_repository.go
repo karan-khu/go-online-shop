@@ -23,29 +23,29 @@ func NewUserRepository(logger *slog.Logger, conf *config.Config) UserRepository 
 	}
 }
 
-func (r *UserRepositoryImpl) Creating(user *UserEntity) (result *UserEntity, err error) {
+func (r *UserRepositoryImpl) Creating(user *UserEntity) (*UserEntity, error) {
 	newUser := new(models.UserRecord)
 	copier.Copy(newUser, user)
 
 	userRecord := new(models.UserRecord)
-	if err = r.db.Connect().Create(newUser).Scan(userRecord).Error; err != nil {
+	if err := r.db.Connect().Create(newUser).Scan(userRecord).Error; err != nil {
 		r.logger.Error("failed to create user", "error", err)
 		return nil, errors.New("failed to create user")
 	}
 
-	result = new(UserEntity)
+	result := new(UserEntity)
 	copier.Copy(result, userRecord)
 	return result, nil
 }
 
-func (r *UserRepositoryImpl) FindById(userId string) (result *UserEntity, err error) {
+func (r *UserRepositoryImpl) FindById(userId string) (*UserEntity, error) {
 	userRecord := new(models.UserRecord)
-	if err = r.db.Connect().Where("UserId = ?", userId).First(userRecord).Error; err != nil {
+	if err := r.db.Connect().Where("UserId = ?", userId).First(userRecord).Error; err != nil {
 		r.logger.Error("failed to find user by id", "error", err)
 		return nil, errors.New("user not found")
 	}
 
-	result = new(UserEntity)
+	result := new(UserEntity)
 	copier.Copy(result, userRecord)
 	return result, nil
 }

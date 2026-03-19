@@ -22,7 +22,7 @@ func NewItemShopRepository(logger *slog.Logger, conf *config.Config) ItemShopRep
 	}
 }
 
-func (r *itemShopRepositoryImpl) Listing(limit int, page int, searchText string) (results []*ItemShopEntity, total int64, err error) {
+func (r *itemShopRepositoryImpl) Listing(limit int, page int, searchText string) ([]*ItemShopEntity, int64, error) {
 	itemRecords := make([]*models.ItemRecord, 0)
 
 	query := r.db.Connect().Model(&models.ItemRecord{}).Where("ActiveStatus = ?", "AVAILABLE")
@@ -31,18 +31,19 @@ func (r *itemShopRepositoryImpl) Listing(limit int, page int, searchText string)
 		query = query.Where("Name LIKE ? OR Description LIKE ?", searchText, searchText)
 	}
 
-	if err = query.Count(&total).Error; err != nil {
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
 		r.logger.Error("failed to get item total", "error", err)
 		return nil, 0, err
 	}
 
 	query = query.Offset((page - 1) * limit).Limit(limit)
-	if err = query.Find(&itemRecords).Error; err != nil {
+	if err := query.Find(&itemRecords).Error; err != nil {
 		r.logger.Error("failed to get item listing", "error", err)
 		return nil, 0, err
 	}
 
-	results = make([]*ItemShopEntity, 0)
+	results := make([]*ItemShopEntity, 0)
 	copier.Copy(&results, &itemRecords)
 	return results, total, nil
 }

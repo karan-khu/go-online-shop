@@ -24,7 +24,7 @@ func NewItemRepository(logger *slog.Logger, conf *config.Config) ItemRepository 
 	}
 }
 
-func (r *itemRepositoryImpl) Listing(limit int, page int, searchText string) (results []*ItemEntity, total int64, err error) {
+func (r *itemRepositoryImpl) Listing(limit int, page int, searchText string) ([]*ItemEntity, int64, error) {
 	itemRecords := make([]*models.ItemRecord, 0)
 
 	query := r.db.Connect().Model(&models.ItemRecord{}).Where("ActiveStatus = ?", "AVAILABLE")
@@ -33,30 +33,31 @@ func (r *itemRepositoryImpl) Listing(limit int, page int, searchText string) (re
 		query = query.Where("Name LIKE ? OR Description LIKE ?", searchText, searchText)
 	}
 
-	if err = query.Count(&total).Error; err != nil {
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
 		r.logger.Error("failed to get item total", "error", err)
 		return nil, 0, err
 	}
 
 	query = query.Offset((page - 1) * limit).Limit(limit)
-	if err = query.Find(&itemRecords).Error; err != nil {
+	if err := query.Find(&itemRecords).Error; err != nil {
 		r.logger.Error("failed to get item listing", "error", err)
 		return nil, 0, err
 	}
 
-	results = make([]*ItemEntity, 0)
+	results := make([]*ItemEntity, 0)
 	copier.Copy(&results, &itemRecords)
 	return results, total, nil
 }
 
-func (r *itemRepositoryImpl) FindById(itemId int) (result *ItemEntity, err error) {
+func (r *itemRepositoryImpl) FindById(itemId int) (*ItemEntity, error) {
 	itemRecord := new(models.ItemRecord)
 	if err := r.db.Connect().Where("ItemId = ?", itemId).First(itemRecord).Error; err != nil {
 		r.logger.Error("failed to find item by id", "error", err)
 		return nil, errors.New("item not found")
 	}
 
-	result = new(ItemEntity)
+	result := new(ItemEntity)
 	copier.Copy(result, itemRecord)
 	return result, nil
 }
@@ -70,7 +71,7 @@ func (r *itemRepositoryImpl) FindExists(itemId int) bool {
 	return count > 0
 }
 
-func (r *itemRepositoryImpl) Create(item *ItemEntity) (result *ItemEntity, err error) {
+func (r *itemRepositoryImpl) Create(item *ItemEntity) (*ItemEntity, error) {
 	newItem := new(models.ItemRecord)
 	copier.Copy(newItem, item)
 
@@ -80,7 +81,7 @@ func (r *itemRepositoryImpl) Create(item *ItemEntity) (result *ItemEntity, err e
 		return nil, err
 	}
 
-	result = new(ItemEntity)
+	result := new(ItemEntity)
 	copier.Copy(result, itemRecord)
 	return result, nil
 }

@@ -24,19 +24,19 @@ func NewPurchaseRepository(logger *slog.Logger, conf *config.Config) PurchaseRep
 	}
 }
 
-func (r *purchaseRepositoryImpl) Listing(userId string) (results []*PurchaseHistoryEntity, err error) {
+func (r *purchaseRepositoryImpl) Listing(userId string) ([]*PurchaseHistoryEntity, error) {
 	purchaseRecords := make([]*models.PurchaseHistoryRecord, 0)
 	if err := r.db.Connect().Where("BuyerId = ? AND ActiveStatus = ?", userId, "AVAILABLE").Find(&purchaseRecords).Error; err != nil {
 		r.logger.Error("failed to list purchase", "error", err)
 		return nil, errors.New("failed to list purchase")
 	}
 
-	results = make([]*PurchaseHistoryEntity, 0)
+	results := make([]*PurchaseHistoryEntity, 0)
 	copier.Copy(&results, &purchaseRecords)
 	return results, nil
 }
 
-func (r *purchaseRepositoryImpl) Create(tx *gorm.DB, purchase *PurchaseHistoryEntity) (result *PurchaseHistoryEntity, err error) {
+func (r *purchaseRepositoryImpl) Create(tx *gorm.DB, purchase *PurchaseHistoryEntity) (*PurchaseHistoryEntity, error) {
 	conn := r.db.Connect()
 	if tx != nil {
 		conn = tx
@@ -51,7 +51,7 @@ func (r *purchaseRepositoryImpl) Create(tx *gorm.DB, purchase *PurchaseHistoryEn
 		return nil, errors.New("failed to create purchase")
 	}
 
-	result = new(PurchaseHistoryEntity)
+	result := new(PurchaseHistoryEntity)
 	copier.Copy(result, purchaseRecord)
 	return result, nil
 }
