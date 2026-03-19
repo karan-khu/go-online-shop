@@ -7,12 +7,9 @@ import (
 )
 
 func RegisterRoutes(app *echo.Echo, httpHandler ItemHttpHandler, authMiddleware middleware.AuthorizationMiddleware) {
-	router := app.Group("/api/v1/items")
+	v1 := app.Group("/api/v1/items")
 
-	router.GET("", httpHandler.GetAll, authMiddleware.Authorizing)
-	router.POST("/create", httpHandler.Create, authMiddleware.Authorizing)
-	router.PUT("/edit", httpHandler.Edit, authMiddleware.Authorizing)
-	router.DELETE("/delete/:item_id", httpHandler.Delete, authMiddleware.Authorizing)
-	router.POST("/buy", httpHandler.Buying, authMiddleware.Authorizing)
-	router.POST("/sell", httpHandler.Selling, authMiddleware.Authorizing)
+	v1.POST("/create", httpHandler.Create, authMiddleware.Authorizing)
+	v1.PUT("/edit", httpHandler.Edit, authMiddleware.Authorizing)
+	v1.DELETE("/delete/:item_id", httpHandler.Delete, authMiddleware.Authorizing)
 }

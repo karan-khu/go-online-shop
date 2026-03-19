@@ -12,10 +12,10 @@ type BalanceHttpHandler interface {
 
 type BalanceUsecase interface {
 	CoinAdding(req *CoinTopUpRequest) (*UserBalanceEntity, error)
-	CoinShowBalance(userId string) *UserCoinDisplay
+	CoinShowBalance(userId string) *UserCoin
 }
 
 type BalanceRepository interface {
 	CoinAdd(tx *gorm.DB, req *UserBalanceEntity) (*UserBalanceEntity, error)
-	CoinShow(userId string) (*UserCoinDisplay, error)
+	CoinShow(userId string) (*UserCoin, error)
 }

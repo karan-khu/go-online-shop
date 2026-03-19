@@ -7,8 +7,8 @@ import (
 )
 
 func RegisterBalanceRoutes(app *echo.Echo, httpHandler BalanceHttpHandler, authMiddleware middleware.AuthorizationMiddleware) {
-	router := app.Group("/api/v1/balance")
+	v1 := app.Group("/api/v1/balance")
 
-	router.GET("/show", httpHandler.CoinShowBalance, authMiddleware.Authorizing)
-	router.POST("/topup", httpHandler.CoinTopUp, authMiddleware.Authorizing)
+	v1.GET("/show", httpHandler.CoinShowBalance, authMiddleware.Authorizing)
+	v1.POST("/topup", httpHandler.CoinTopUp, authMiddleware.Authorizing)
 }

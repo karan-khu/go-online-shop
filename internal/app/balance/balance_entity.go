@@ -3,13 +3,16 @@ package balance
 import "time"
 
 type UserBalanceEntity struct {
-	BalanceId int       `gorm:"column:BalanceId;primaryKey;autoIncrement"`
-	UserId    string    `gorm:"column:UserId"`
-	Amount    int       `gorm:"column:Amount"`
-	Status    string    `gorm:"column:Status;size:10;comment:BUY/TOPUP"`
-	CreatedAt time.Time `gorm:"column:CreatedAt;autoCreateTime"`
+	BalanceId int
+	UserId    string
+	Amount    int
+	Status    string
+	CreatedAt time.Time
 }
 
-func (UserBalanceEntity) TableName() string {
-	return "GOST_UserBalances"
+type UserCoin struct {
+	UserId   string `json:"user_id"`
+	FullName string `json:"full_name"`
+	Email    string `json:"email"`
+	Coin     int    `json:"coin"`
 }

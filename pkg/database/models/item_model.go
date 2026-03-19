@@ -12,8 +12,6 @@ type ItemRecord struct {
 	ActiveStatus string    `gorm:"column:ActiveStatus;size:20;default:AVAILABLE"`
 	CreatedAt    time.Time `gorm:"column:CreatedAt;autoCreateTime"`
 	UpdatedAt    time.Time `gorm:"column:UpdatedAt;autoUpdateTime"`
-
-	Admin UserRecord `gorm:"foreignKey:AdminId;references:UserId"`
 }
 
 func (ItemRecord) TableName() string {

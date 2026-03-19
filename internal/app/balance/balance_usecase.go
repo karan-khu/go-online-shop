@@ -25,10 +25,10 @@ func (u *BalanceUsecaseImpl) CoinAdding(req *CoinTopUpRequest) (*UserBalanceEnti
 	return newBalance, nil
 }
 
-func (u *BalanceUsecaseImpl) CoinShowBalance(userId string) *UserCoinDisplay {
+func (u *BalanceUsecaseImpl) CoinShowBalance(userId string) *UserCoin {
 	coin, err := u.balanceRepo.CoinShow(userId)
 	if err != nil {
-		return &UserCoinDisplay{
+		return &UserCoin{
 			UserId: userId,
 			Coin:   0,
 		}

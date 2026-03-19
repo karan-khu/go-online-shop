@@ -22,8 +22,8 @@ func NewInventoryRepository(logger *slog.Logger, conf *config.Config) InventoryR
 	}
 }
 
-func (r *inventoryRepositoryImpl) Listing(userId string) ([]*QueryInventoryItemEntity, error) {
-	listInventory := make([]*QueryInventoryItemEntity, 0)
+func (r *inventoryRepositoryImpl) Listing(userId string) ([]*InventoryEntity, error) {
+	listInventory := make([]*InventoryEntity, 0)
 	if err := r.db.Connect().
 		Raw(`
 			SELECT 

@@ -13,9 +13,6 @@ type PurchaseHistoryRecord struct {
 	Type            string    `gorm:"column:Type;size:10;comment:BUY/SELL"`
 	ActiveStatus    string    `gorm:"column:ActiveStatus;size:20;default:AVAILABLE"`
 	CreatedAt       time.Time `gorm:"column:CreatedAt;autoCreateTime"`
-
-	Buyer UserRecord `gorm:"foreignKey:BuyerId;references:UserId"`
-	Item  ItemRecord `gorm:"foreignKey:ItemId;references:ItemId"`
 }
 
 func (PurchaseHistoryRecord) TableName() string {

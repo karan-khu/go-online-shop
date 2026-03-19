@@ -1,12 +1,15 @@
 package balance
 
 import (
+	"errors"
 	"log/slog"
 
+	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/pkg/database"
+	"github.com/karan-khu/go-online-shop/pkg/database/models"
 )
 
 type BalanceRepositoryImpl struct {
@@ -21,32 +24,33 @@ func NewBalanceRepository(logger *slog.Logger, conf *config.Config) BalanceRepos
 	}
 }
 
-func (r *BalanceRepositoryImpl) CoinAdd(tx *gorm.DB, req *UserBalanceEntity) (*UserBalanceEntity, error) {
+func (r *BalanceRepositoryImpl) CoinAdd(tx *gorm.DB, req *UserBalanceEntity) (result *UserBalanceEntity, err error) {
 	conn := r.db.Connect()
 	if tx != nil {
 		conn = tx
 	}
+	newBalance := new(models.UserBalanceRecord)
+	copier.Copy(newBalance, req)
 
-	newBalance := new(UserBalanceEntity)
-	if err := conn.Create(req).Scan(newBalance).Error; err != nil {
+	balanceRecord := new(models.UserBalanceRecord)
+	if err := conn.Create(newBalance).Scan(balanceRecord).Error; err != nil {
 		r.logger.Error("failed to create balance", "error", err)
-		return nil, err
+		return nil, errors.New("failed to create balance")
 	}
 
-	return newBalance, nil
+	copier.Copy(result, balanceRecord)
+	return result, nil
 }
 
-func (r *BalanceRepositoryImpl) CoinShow(userId string) (*UserCoinDisplay, error) {
-	coin := new(UserCoinDisplay)
-
-	if err := r.db.Connect().Model(&UserBalanceEntity{}).
+func (r *BalanceRepositoryImpl) CoinShow(userId string) (result *UserCoin, err error) {
+	if err := r.db.Connect().Model(&models.UserBalanceRecord{}).
 		Where("UserId = ?", userId).
-		Select("UserId, SUM(Amount) AS Coin").
+		Select("UserId, FullName, Email, SUM(Amount) AS Coin").
 		Group("UserId").
-		Scan(coin).Error; err != nil {
+		Scan(result).Error; err != nil {
 		r.logger.Error("failed to show coin", "error", err)
-		return nil, err
+		return nil, errors.New("failed to get coin")
 	}
 
-	return coin, nil
+	return result, nil
 }

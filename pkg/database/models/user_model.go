@@ -11,11 +11,6 @@ type UserRecord struct {
 	ActiveStatus string    `gorm:"column:ActiveStatus;size:20;default:AVAILABLE"`
 	CreatedAt    time.Time `gorm:"column:CreatedAt;autoCreateTime"`
 	UpdatedAt    time.Time `gorm:"column:UpdatedAt;autoUpdateTime"`
-
-	Balances          []UserBalanceRecord     `gorm:"foreignKey:UserId;references:UserId"`
-	Items             []ItemRecord            `gorm:"foreignKey:AdminId;references:UserId"`
-	PurchaseHistories []PurchaseHistoryRecord `gorm:"foreignKey:BuyerId;references:UserId"`
-	Inventories       []InventoryRecord       `gorm:"foreignKey:UserId;references:UserId"`
 }
 
 func (UserRecord) TableName() string {

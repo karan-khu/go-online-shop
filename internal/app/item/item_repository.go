@@ -4,10 +4,12 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/pkg/database"
+	"github.com/karan-khu/go-online-shop/pkg/database/models"
 )
 
 type itemRepositoryImpl struct {
@@ -22,36 +24,39 @@ func NewItemRepository(logger *slog.Logger, conf *config.Config) ItemRepository 
 	}
 }
 
-func (r *itemRepositoryImpl) Listing(req *RequestItemFilter) ([]*ItemEntity, int, error) {
-	list := make([]*ItemEntity, 0)
+func (r *itemRepositoryImpl) Listing(limit int, page int, searchText string) (results []*ItemEntity, total int64, err error) {
+	itemRecords := make([]*models.ItemRecord, 0)
 
-	query := r.db.Connect().Model(&ItemEntity{}).Where("ActiveStatus = ?", "AVAILABLE")
-	if req.SearchText != "" {
-		searchText := "%" + req.SearchText + "%"
+	query := r.db.Connect().Model(&models.ItemRecord{}).Where("ActiveStatus = ?", "AVAILABLE")
+	if searchText != "" {
+		searchText := "%" + searchText + "%"
 		query = query.Where("Name LIKE ? OR Description LIKE ?", searchText, searchText)
 	}
 
-	var totalCount int64
-	if err := query.Count(&totalCount).Error; err != nil {
+	if err = query.Count(&total).Error; err != nil {
 		r.logger.Error("failed to get item total", "error", err)
 		return nil, 0, err
 	}
 
-	query = query.Offset((req.Page - 1) * req.Limit).Limit(req.Limit)
-	if err := query.Find(&list).Error; err != nil {
+	query = query.Offset((page - 1) * limit).Limit(limit)
+	if err = query.Find(&itemRecords).Error; err != nil {
 		r.logger.Error("failed to get item listing", "error", err)
 		return nil, 0, err
 	}
-	return list, int(totalCount), nil
+
+	copier.Copy(results, itemRecords)
+	return results, total, nil
 }
 
-func (r *itemRepositoryImpl) FindById(itemId int) (*ItemEntity, error) {
-	item := new(ItemEntity)
-	if err := r.db.Connect().Where("ItemId = ?", itemId).First(item).Error; err != nil {
+func (r *itemRepositoryImpl) FindById(itemId int) (result *ItemEntity, err error) {
+	itemRecord := new(models.ItemRecord)
+	if err := r.db.Connect().Where("ItemId = ?", itemId).First(itemRecord).Error; err != nil {
 		r.logger.Error("failed to find item by id", "error", err)
 		return nil, errors.New("item not found")
 	}
-	return item, nil
+
+	copier.Copy(result, itemRecord)
+	return result, nil
 }
 
 func (r *itemRepositoryImpl) FindExists(itemId int) bool {
@@ -63,15 +68,17 @@ func (r *itemRepositoryImpl) FindExists(itemId int) bool {
 	return count > 0
 }
 
-func (r *itemRepositoryImpl) Create(item *ItemEntity) (*ItemEntity, error) {
-	newItem := new(ItemEntity)
+func (r *itemRepositoryImpl) Create(item *ItemEntity) (result *ItemEntity, err error) {
+	newItem := new(models.ItemRecord)
 
-	if err := r.db.Connect().Create(item).Scan(newItem).Error; err != nil {
+	itemRecord := new(models.ItemRecord)
+	if err := r.db.Connect().Create(newItem).Scan(itemRecord).Error; err != nil {
 		r.logger.Error("failed to create item", "error", err)
 		return nil, err
 	}
 
-	return newItem, nil
+	copier.Copy(result, itemRecord)
+	return result, nil
 }
 
 func (r *itemRepositoryImpl) Edit(item *ItemEntity) (*ItemEntity, error) {

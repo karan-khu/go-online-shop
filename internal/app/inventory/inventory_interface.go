@@ -14,7 +14,7 @@ type InventoryUsecase interface {
 }
 
 type InventoryRepository interface {
-	Listing(userId string) ([]*QueryInventoryItemEntity, error)
+	Listing(userId string) ([]*InventoryEntity, error)
 	Filling(tx *gorm.DB, userId string, itemId int, qty int) ([]*InventoryEntity, error)
 	Removing(tx *gorm.DB, userId string, itemId int, limit int) error
 	UserItemCount(userId string, itemId int) int

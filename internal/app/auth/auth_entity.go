@@ -1,10 +1,10 @@
 package auth
 
 type UserEntity struct {
-	UserId   string `gorm:"column:UserId;primaryKey"`
-	FullName string `gorm:"column:FullName;size:255"`
-	Email    string `gorm:"column:Email;size:255"`
-	Picture  string `gorm:"column:Picture;size:255"`
+	UserId   string
+	FullName string
+	Email    string
+	Picture  string
 }
 
 type UserCredential struct {

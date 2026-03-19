@@ -7,7 +7,7 @@ import (
 )
 
 func RegisterRoutes(app *echo.Echo, httpHandler PurchaseHttpHandler, authMiddleware middleware.AuthorizationMiddleware) {
-	router := app.Group("/api/v1/purchase")
+	v1 := app.Group("/api/v1/purchase")
 
-	router.GET("", httpHandler.Listing, authMiddleware.Authorizing)
+	v1.GET("", httpHandler.Listing, authMiddleware.Authorizing)
 }

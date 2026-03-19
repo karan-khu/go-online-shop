@@ -5,9 +5,9 @@ import (
 )
 
 func RegisterRoutes(app *echo.Echo, googleHandler AuthGoogleHandler) {
-	router := app.Group("/api/v1/auth")
+	v1 := app.Group("/api/v1/auth")
 
-	router.GET("/google/login", googleHandler.GoogleLogin)
-	router.GET("/google/callback", googleHandler.GoogleLoginCallBack)
-	router.POST("/google/logout", googleHandler.Logout)
+	v1.GET("/google/login", googleHandler.GoogleLogin)
+	v1.GET("/google/callback", googleHandler.GoogleLoginCallBack)
+	v1.POST("/google/logout", googleHandler.Logout)
 }

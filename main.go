@@ -86,7 +86,7 @@ func main() {
 	itemRepo := item.NewItemRepository(server.Logger, server.conf)
 	purchaseRepo := purchase.NewPurchaseRepository(server.Logger, server.conf)
 	purchaseUsecase := purchase.NewPurchaseUsecase(purchaseRepo)
-	itemUsecase := item.NewItemUsecase(server.Logger, itemRepo, balanceRepo, inventoryRepo, purchaseRepo, server.imageBuilder)
+	itemUsecase := item.NewItemUsecase(server.Logger, itemRepo, server.imageBuilder)
 	itemHttpHandler := item.NewItemHttpHandler(itemUsecase)
 	purchaseHttpHandler := purchase.NewPurchaseHttpHandler(server.Logger, purchaseUsecase)
 

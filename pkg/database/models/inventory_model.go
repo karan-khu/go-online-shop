@@ -8,9 +8,6 @@ type InventoryRecord struct {
 	ItemId       int       `gorm:"column:ItemId"`
 	ActiveStatus string    `gorm:"column:ActiveStatus;size:20;default:AVAILABLE"`
 	CreatedAt    time.Time `gorm:"column:CreatedAt;autoCreateTime"`
-
-	User UserRecord `gorm:"foreignKey:UserId;references:UserId"`
-	Item ItemRecord `gorm:"foreignKey:ItemId;references:ItemId"`
 }
 
 func (InventoryRecord) TableName() string {
