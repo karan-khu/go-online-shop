@@ -3,7 +3,7 @@ package config
 import (
 	"log"
 
-	"github.com/karan-khu/go-online-shop/pkg/database"
+	"github.com/karan-khu/go-online-shop/internal/infra/database"
 )
 
 type Config struct {

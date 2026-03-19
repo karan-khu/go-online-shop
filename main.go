@@ -22,8 +22,8 @@ import (
 	"github.com/karan-khu/go-online-shop/internal/app/purchase"
 	"github.com/karan-khu/go-online-shop/internal/app/user"
 	"github.com/karan-khu/go-online-shop/internal/middleware"
-	"github.com/karan-khu/go-online-shop/pkg/upload"
-	"github.com/karan-khu/go-online-shop/pkg/validator"
+	"github.com/karan-khu/go-online-shop/internal/echovalidator"
+	"github.com/karan-khu/go-online-shop/internal/upload"
 )
 
 type Server struct {
@@ -44,7 +44,7 @@ func NewServer() *Server {
 		Level: level,
 	}))
 
-	app.Validator = validator.NewValidator()
+	app.Validator = echovalidator.NewValidator()
 
 	app.Static("/uploads", "./uploads")
 

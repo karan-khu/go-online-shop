@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/karan-khu/go-online-shop/pkg/res"
+	"github.com/karan-khu/go-online-shop/internal/response"
 )
 
 type purchaseHttpHandlerImpl struct {
@@ -24,13 +24,13 @@ func NewPurchaseHttpHandler(logger *slog.Logger, purchaseUsecase PurchaseUsecase
 func (h *purchaseHttpHandlerImpl) Listing(c *echo.Context) error {
 	userId := c.Get("userId").(string)
 	if userId == "" {
-		return res.Unauthorized(c, errors.New("Unauthorized"))
+		return response.Unauthorized(c, errors.New("Unauthorized"))
 	}
 
 	purchase, err := h.purchaseUsecase.Listing(userId)
 	if err != nil {
 		h.logger.Error("failed to get purchase list", "error", err)
-		return res.InternalError(c, err)
+		return response.InternalError(c, err)
 	}
-	return res.Success(c, "Purchase list fetched successfully", purchase)
+	return response.Success(c, "Purchase list fetched successfully", purchase)
 }

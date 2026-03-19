@@ -7,8 +7,8 @@ import (
 	"github.com/jinzhu/copier"
 
 	"github.com/karan-khu/go-online-shop/config"
-	"github.com/karan-khu/go-online-shop/pkg/database"
-	"github.com/karan-khu/go-online-shop/pkg/database/models"
+	"github.com/karan-khu/go-online-shop/internal/infra/database"
+	"github.com/karan-khu/go-online-shop/internal/infra/database/models"
 )
 
 type UserRepositoryImpl struct {

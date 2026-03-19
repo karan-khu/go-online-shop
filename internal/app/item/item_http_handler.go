@@ -6,7 +6,7 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/karan-khu/go-online-shop/pkg/res"
+	"github.com/karan-khu/go-online-shop/internal/response"
 )
 
 type itemHttpHandlerImpl struct {
@@ -23,52 +23,52 @@ func (h *itemHttpHandlerImpl) Create(pctx *echo.Context) error {
 	req := new(RequestItemCreate)
 	if err := pctx.Bind(req); err != nil {
 		pctx.Logger().Error("failed to bind request", "error", err)
-		return res.BadRequest(pctx, err)
+		return response.BadRequest(pctx, err)
 	} else if err := pctx.Validate(req); err != nil {
-		return res.BadRequest(pctx, err)
+		return response.BadRequest(pctx, err)
 	}
 
 	item, err := h.itemUsecase.CreateItem(req)
 	if err != nil {
 		pctx.Logger().Error("failed to create item", "error", err)
-		return res.InternalError(pctx, err)
+		return response.InternalError(pctx, err)
 	}
 
-	return res.Success(pctx, "Item created successfully", item)
+	return response.Success(pctx, "Item created successfully", item)
 }
 
 func (h *itemHttpHandlerImpl) Edit(pctx *echo.Context) error {
 	req := new(RequestItemEdit)
 	if err := pctx.Bind(req); err != nil {
 		pctx.Logger().Error("failed to bind request", "error", err)
-		return res.BadRequest(pctx, err)
+		return response.BadRequest(pctx, err)
 	} else if err := pctx.Validate(req); err != nil {
-		return res.BadRequest(pctx, err)
+		return response.BadRequest(pctx, err)
 	}
 
 	item, err := h.itemUsecase.EditItem(req)
 	if err != nil {
 		pctx.Logger().Error("failed to edit item", "error", err)
-		return res.InternalError(pctx, err)
+		return response.InternalError(pctx, err)
 	}
 
-	return res.Success(pctx, "Item edited successfully", item)
+	return response.Success(pctx, "Item edited successfully", item)
 }
 
 func (h *itemHttpHandlerImpl) Delete(pctx *echo.Context) error {
 	p_itemId := pctx.Param("item_id")
 	if p_itemId == "" {
-		return res.BadRequest(pctx, errors.New("item ID is required"))
+		return response.BadRequest(pctx, errors.New("item ID is required"))
 	}
 	itemId, ConvertErr := strconv.Atoi(p_itemId)
 	if ConvertErr != nil {
-		return res.BadRequest(pctx, ConvertErr)
+		return response.BadRequest(pctx, ConvertErr)
 	}
 
 	if err := h.itemUsecase.DeleteItem(itemId); err != nil {
 		pctx.Logger().Error("failed to delete item", "error", err)
-		return res.BadRequest(pctx, err)
+		return response.BadRequest(pctx, err)
 	}
 
-	return res.Success(pctx, "Item deleted successfully", nil)
+	return response.Success(pctx, "Item deleted successfully", nil)
 }

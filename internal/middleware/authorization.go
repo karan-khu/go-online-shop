@@ -13,7 +13,7 @@ import (
 
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/internal/app/auth"
-	"github.com/karan-khu/go-online-shop/pkg/res"
+	"github.com/karan-khu/go-online-shop/internal/response"
 )
 
 type AuthorizationMiddleware interface {
@@ -43,13 +43,13 @@ func (m *AuthorizationMiddlewareImpl) Authorizing(next echo.HandlerFunc) echo.Ha
 		token, err := m.getToken(pctx)
 		if err != nil {
 			m.logger.Error("Failed to get token", "error", err)
-			return res.Unauthorized(pctx, errors.New("Unauthorized"))
+			return response.Unauthorized(pctx, errors.New("Unauthorized"))
 		}
 
 		if !token.Valid() {
 			if token, err = m.tokenRefreshing(pctx, token); err != nil {
 				pctx.Logger().Error("Token is not valid", "error", err)
-				return res.Unauthorized(pctx, errors.New("Unauthorized"))
+				return response.Unauthorized(pctx, errors.New("Unauthorized"))
 			}
 		}
 
@@ -58,12 +58,12 @@ func (m *AuthorizationMiddlewareImpl) Authorizing(next echo.HandlerFunc) echo.Ha
 		userInfo, err := m.getUserInfo(client)
 		if err != nil {
 			m.logger.Error("Failed to get user info", "error", err)
-			return res.Unauthorized(pctx, errors.New("Unauthorized"))
+			return response.Unauthorized(pctx, errors.New("Unauthorized"))
 		}
 
 		if !m.authUsecase.UserExists(userInfo.ID) {
 			m.logger.Error("User does not exist", "userID", userInfo.ID)
-			return res.Unauthorized(pctx, errors.New("User does not exist"))
+			return response.Unauthorized(pctx, errors.New("User does not exist"))
 		}
 
 		pctx.Set("userId", userInfo.ID)

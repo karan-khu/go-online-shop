@@ -9,7 +9,7 @@ import (
 	"github.com/karan-khu/go-online-shop/internal/app/inventory"
 	"github.com/karan-khu/go-online-shop/internal/app/item"
 	"github.com/karan-khu/go-online-shop/internal/app/purchase"
-	"github.com/karan-khu/go-online-shop/pkg/upload"
+	"github.com/karan-khu/go-online-shop/internal/upload"
 )
 
 type itemShopUsecaseImpl struct {

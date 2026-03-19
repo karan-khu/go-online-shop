@@ -4,7 +4,7 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/karan-khu/go-online-shop/pkg/upload"
+	"github.com/karan-khu/go-online-shop/internal/upload"
 )
 
 type itemUsecaseImpl struct {

@@ -14,7 +14,7 @@ import (
 	"github.com/labstack/echo/v5"
 
 	"github.com/karan-khu/go-online-shop/config"
-	"github.com/karan-khu/go-online-shop/pkg/res"
+	"github.com/karan-khu/go-online-shop/internal/response"
 )
 
 var (
@@ -70,13 +70,13 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 	}
 	if errValidate != nil {
 		h.logger.Error("Failed to validate callback", "error", errValidate)
-		return res.Unauthorized(pctx, errValidate)
+		return response.Unauthorized(pctx, errValidate)
 	}
 
 	token, err := h.oauth2Config.GoogleOAuth2Config.Exchange(ctx, pctx.QueryParam("code"))
 	if err != nil {
 		h.logger.Error("Failed to exchange token", "error", err)
-		return res.Unauthorized(pctx, err)
+		return response.Unauthorized(pctx, err)
 	}
 
 	client := h.oauth2Config.GoogleOAuth2Config.Client(ctx, token)
@@ -84,7 +84,7 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 	userInfo, err := h.getUserInfo(client)
 	if err != nil {
 		h.logger.Error("Failed to get user info", "error", err)
-		return res.Unauthorized(pctx, err)
+		return response.Unauthorized(pctx, err)
 	}
 	h.logger.Info("User info", "user", userInfo)
 
@@ -96,7 +96,7 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 	}
 	if err := h.authGoogleUsecase.UserLogin(userReq); err != nil {
 		h.logger.Error("Failed to login user", "error", err)
-		return res.Unauthorized(pctx, err)
+		return response.Unauthorized(pctx, err)
 	}
 
 	pctx.SetCookie(&http.Cookie{
@@ -124,19 +124,19 @@ func (h *AuthGoogleHandlerImpl) GoogleLoginCallBack(pctx *echo.Context) error {
 		})
 		return pctx.Redirect(http.StatusFound, callbackUrl.Value)
 	}
-	return res.Success(pctx, "Logged in successfully", userInfo)
+	return response.Success(pctx, "Logged in successfully", userInfo)
 }
 
 func (h *AuthGoogleHandlerImpl) Logout(pctx *echo.Context) error {
 	accessToken, err := pctx.Request().Cookie(h.oauth2Config.AccessTokenKey)
 	if err != nil {
 		h.logger.Error("Access token cookie not found", "error", err)
-		return res.BadRequest(pctx, err)
+		return response.BadRequest(pctx, err)
 	}
 
 	if err := h.revokeToken(accessToken.Value); err != nil {
 		h.logger.Error("Failed to revoke token", "error", err)
-		return res.InternalError(pctx, err)
+		return response.InternalError(pctx, err)
 	}
 
 	pctx.SetCookie(&http.Cookie{
@@ -151,7 +151,7 @@ func (h *AuthGoogleHandlerImpl) Logout(pctx *echo.Context) error {
 		HttpOnly: true,
 		MaxAge:   -1,
 	})
-	return res.Success(pctx, "Logged out successfully", nil)
+	return response.Success(pctx, "Logged out successfully", nil)
 }
 
 func randomState() string {

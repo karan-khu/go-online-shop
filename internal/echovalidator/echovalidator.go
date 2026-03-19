@@ -1,4 +1,4 @@
-package validator
+package echovalidator
 
 import (
 	"github.com/go-playground/validator/v10"

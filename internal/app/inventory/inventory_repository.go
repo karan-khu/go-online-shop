@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/karan-khu/go-online-shop/config"
-	"github.com/karan-khu/go-online-shop/pkg/database"
+	"github.com/karan-khu/go-online-shop/internal/infra/database"
 )
 
 type inventoryRepositoryImpl struct {

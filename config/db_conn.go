@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/karan-khu/go-online-shop/pkg/database"
+	"github.com/karan-khu/go-online-shop/internal/infra/database"
 )
 
 type DbConn struct {

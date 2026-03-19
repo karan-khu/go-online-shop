@@ -5,7 +5,7 @@ import (
 
 	"github.com/labstack/echo/v5"
 
-	"github.com/karan-khu/go-online-shop/pkg/res"
+	"github.com/karan-khu/go-online-shop/internal/response"
 )
 
 type inventoryHttpHandlerImpl struct {
@@ -25,7 +25,7 @@ func (h *inventoryHttpHandlerImpl) Listing(pctx *echo.Context) error {
 	inventory, err := h.inventoryUsecase.Listing(userId)
 	if err != nil {
 		h.logger.Error("failed to get inventory list", "error", err)
-		return res.InternalError(pctx, err)
+		return response.InternalError(pctx, err)
 	}
-	return res.Success(pctx, "Inventory list fetched successfully", inventory)
+	return response.Success(pctx, "Inventory list fetched successfully", inventory)
 }
