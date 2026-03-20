@@ -20,6 +20,11 @@ func NewItemHttpHandler(itemUsecase ItemUsecase) ItemHttpHandler {
 }
 
 func (h *itemHttpHandlerImpl) Create(pctx *echo.Context) error {
+	adminId, ok := pctx.Get("userId").(string)
+	if !ok || adminId == "" {
+		return response.Unauthorized(pctx, errors.New("Unauthorized"))
+	}
+
 	req := new(RequestItemCreate)
 	if err := pctx.Bind(req); err != nil {
 		pctx.Logger().Error("failed to bind request", "error", err)
@@ -28,7 +33,7 @@ func (h *itemHttpHandlerImpl) Create(pctx *echo.Context) error {
 		return response.BadRequest(pctx, err)
 	}
 
-	item, err := h.itemUsecase.CreateItem(req)
+	item, err := h.itemUsecase.CreateItem(req, adminId)
 	if err != nil {
 		pctx.Logger().Error("failed to create item", "error", err)
 		return response.InternalError(pctx, err)

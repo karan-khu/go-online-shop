@@ -19,6 +19,7 @@ import (
 	"github.com/karan-khu/go-online-shop/internal/app/balance"
 	"github.com/karan-khu/go-online-shop/internal/app/inventory"
 	"github.com/karan-khu/go-online-shop/internal/app/item"
+	"github.com/karan-khu/go-online-shop/internal/app/itemshop"
 	"github.com/karan-khu/go-online-shop/internal/app/purchase"
 	"github.com/karan-khu/go-online-shop/internal/app/user"
 	"github.com/karan-khu/go-online-shop/internal/echovalidator"
@@ -85,17 +86,21 @@ func main() {
 	inventoryUsecase := inventory.NewInventoryUsecase(inventoryRepo)
 	inventoryHttpHandler := inventory.NewInventoryHttpHandler(server.Logger, inventoryUsecase)
 	itemRepo := item.NewItemRepository(server.Logger, server.conf)
+	itemShopRepo := itemshop.NewItemShopRepository(server.Logger, server.conf)
 	purchaseRepo := purchase.NewPurchaseRepository(server.Logger, server.conf)
 	purchaseUsecase := purchase.NewPurchaseUsecase(purchaseRepo)
 	itemUsecase := item.NewItemUsecase(server.Logger, itemRepo, server.imageBuilder)
 	itemHttpHandler := item.NewItemHttpHandler(itemUsecase)
 	purchaseHttpHandler := purchase.NewPurchaseHttpHandler(server.Logger, purchaseUsecase)
+	itemShopUsecase := itemshop.NewItemShopUsecase(server.Logger, itemShopRepo, itemRepo, balanceRepo, inventoryRepo, purchaseRepo, server.imageBuilder)
+	itemShopHttpHandler := itemshop.NewItemShopHttpHandler(itemShopUsecase)
 
 	// Router registering
 	auth.RegisterRoutes(server.Echo, authGoogleHandler)
 	balance.RegisterBalanceRoutes(server.Echo, balanceHttpHandler, authMiddleware)
 	inventory.RegisterRoutes(server.Echo, inventoryHttpHandler, authMiddleware)
 	item.RegisterRoutes(server.Echo, itemHttpHandler, authMiddleware)
+	itemshop.RegisterRoutes(server.Echo, itemShopHttpHandler, authMiddleware)
 	purchase.RegisterRoutes(server.Echo, purchaseHttpHandler, authMiddleware)
 
 	// Start server

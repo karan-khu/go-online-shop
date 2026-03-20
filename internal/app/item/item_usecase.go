@@ -21,8 +21,10 @@ func NewItemUsecase(logger *slog.Logger, itemRepo ItemRepository, imageBuilder u
 	}
 }
 
-func (u *itemUsecaseImpl) CreateItem(req *RequestItemCreate) (*ItemEntity, error) {
-	item, err := u.itemRepo.Create(req.ToEntity())
+func (u *itemUsecaseImpl) CreateItem(req *RequestItemCreate, adminId string) (*ItemEntity, error) {
+	entity := req.ToEntity()
+	entity.AdminId = adminId
+	item, err := u.itemRepo.Create(entity)
 	if err != nil {
 		u.logger.Error("failed to create item", "error", err)
 		return nil, err

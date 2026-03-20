@@ -1,17 +1,17 @@
 info:
   name: Buy
   type: http
-  seq: 5
+  seq: 2
 
 http:
   method: POST
-  url: "{{BASE_URL}}/api/v1/items/buy"
+  url: "{{BASE_URL}}/api/v1/item-shop/buy"
   body:
     type: json
     data: |-
       {
         "item_id": 4,
-        "quantity": 4
+        "quantity": 1
       }
   auth: inherit
 

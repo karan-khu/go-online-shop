@@ -87,17 +87,27 @@ func (r *itemRepositoryImpl) Create(item *ItemEntity) (*ItemEntity, error) {
 }
 
 func (r *itemRepositoryImpl) Edit(item *ItemEntity) (*ItemEntity, error) {
-	newItem := new(ItemEntity)
-	if err := r.db.Connect().Updates(item).Scan(newItem).Where("ItemId = ?", item.ItemId).Error; err != nil {
+	updateItem := new(models.ItemRecord)
+	copier.Copy(updateItem, item)
+
+	if err := r.db.Connect().Where("ItemId = ?", item.ItemId).Updates(updateItem).Error; err != nil {
 		r.logger.Error("failed to edit item", "error", err)
 		return nil, err
 	}
 
-	return newItem, nil
+	itemRecord := new(models.ItemRecord)
+	if err := r.db.Connect().Where("ItemId = ?", item.ItemId).First(itemRecord).Error; err != nil {
+		r.logger.Error("failed to find item after edit", "error", err)
+		return nil, err
+	}
+
+	result := new(ItemEntity)
+	copier.Copy(result, itemRecord)
+	return result, nil
 }
 
 func (r *itemRepositoryImpl) Archive(itemId int) error {
-	if err := r.db.Connect().Model(&ItemEntity{}).Where("ItemId = ?", itemId).Update("ActiveStatus", "UNAVAILABLE").Error; err != nil {
+	if err := r.db.Connect().Model(&models.ItemRecord{}).Where("ItemId = ?", itemId).Update("ActiveStatus", "UNAVAILABLE").Error; err != nil {
 		r.logger.Error("failed to archive item", "error", err)
 		return err
 	}

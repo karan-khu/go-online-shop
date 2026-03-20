@@ -11,7 +11,7 @@ type ItemHttpHandler interface {
 }
 
 type ItemUsecase interface {
-	CreateItem(req *RequestItemCreate) (*ItemEntity, error)
+	CreateItem(req *RequestItemCreate, adminId string) (*ItemEntity, error)
 	EditItem(req *RequestItemEdit) (*ItemEntity, error)
 	DeleteItem(itemId int) error
 }

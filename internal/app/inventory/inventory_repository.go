@@ -4,10 +4,12 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 
 	"github.com/karan-khu/go-online-shop/config"
 	"github.com/karan-khu/go-online-shop/internal/infra/database"
+	"github.com/karan-khu/go-online-shop/internal/infra/database/models"
 )
 
 type inventoryRepositoryImpl struct {
@@ -51,9 +53,9 @@ func (r *inventoryRepositoryImpl) Filling(tx *gorm.DB, userId string, itemId int
 		conn = tx
 	}
 
-	inventoryList := make([]*InventoryEntity, 0)
+	inventoryList := make([]*models.InventoryRecord, 0)
 	for range qty {
-		inventoryList = append(inventoryList, &InventoryEntity{
+		inventoryList = append(inventoryList, &models.InventoryRecord{
 			UserId: userId,
 			ItemId: itemId,
 		})
@@ -64,7 +66,9 @@ func (r *inventoryRepositoryImpl) Filling(tx *gorm.DB, userId string, itemId int
 		return nil, errors.New("failed to fill inventory")
 	}
 
-	return inventoryList, nil
+	results := make([]*InventoryEntity, len(inventoryList))
+	copier.Copy(&results, &inventoryList)
+	return results, nil
 }
 
 func (r *inventoryRepositoryImpl) Removing(tx *gorm.DB, userId string, itemId int, limit int) error {
@@ -88,7 +92,7 @@ func (r *inventoryRepositoryImpl) Removing(tx *gorm.DB, userId string, itemId in
 func (r *inventoryRepositoryImpl) UserItemCount(userId string, itemId int) int {
 	var count int64
 	if err := r.db.Connect().
-		Model(&InventoryEntity{}).
+		Model(&models.InventoryRecord{}).
 		Where("UserId = ? AND ItemId = ? AND ActiveStatus = ?", userId, itemId, "AVAILABLE").
 		Count(&count).
 		Error; err != nil {
