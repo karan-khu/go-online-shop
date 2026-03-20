@@ -5,13 +5,13 @@ info:
 
 http:
   method: GET
-  url: "{{BASE_URL}}/api/v1/items?search_text&page=3&limit=3"
+  url: "{{BASE_URL}}/api/v1/items?search_text&page=1&limit=3"
   params:
     - name: search_text
       value: ""
       type: query
     - name: page
-      value: "3"
+      value: "1"
       type: query
     - name: limit
       value: "3"

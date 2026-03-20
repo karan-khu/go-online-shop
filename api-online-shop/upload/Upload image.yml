@@ -12,7 +12,7 @@ http:
       - name: file
         type: file
         value:
-          - /Users/ka12m/Downloads/spell-tome.webp
+          - /Users/ka12m/Downloads/475140028_3998035107098064_8689236669790147680_n.jpg
   auth: inherit
 
 settings:

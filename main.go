@@ -21,8 +21,8 @@ import (
 	"github.com/karan-khu/go-online-shop/internal/app/item"
 	"github.com/karan-khu/go-online-shop/internal/app/purchase"
 	"github.com/karan-khu/go-online-shop/internal/app/user"
-	"github.com/karan-khu/go-online-shop/internal/middleware"
 	"github.com/karan-khu/go-online-shop/internal/echovalidator"
+	"github.com/karan-khu/go-online-shop/internal/middleware"
 	"github.com/karan-khu/go-online-shop/internal/upload"
 )
 
@@ -70,6 +70,7 @@ func main() {
 	// Init endpoint
 	server.GET("/api/v1/health", server.healthCheck)
 	server.POST("/api/v1/upload/image", server.uploadImage)
+	server.GET("*", server.notFound)
 
 	// Register package dependency injection
 	userRepo := user.NewUserRepository(server.Logger, server.conf)
@@ -113,6 +114,10 @@ func main() {
 
 func (s *Server) healthCheck(pctx *echo.Context) error {
 	return pctx.JSON(http.StatusOK, map[string]string{"message": "Server is running!"})
+}
+
+func (s *Server) notFound(pctx *echo.Context) error {
+	return pctx.JSON(http.StatusNotFound, map[string]string{"error": "Not Found"})
 }
 
 func (s *Server) uploadImage(pctx *echo.Context) error {
